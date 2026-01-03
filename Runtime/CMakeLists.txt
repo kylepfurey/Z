@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.16)
 project(ZRuntimeLib C)
 
 # Set C compiler version
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
@@ -25,8 +25,11 @@ add_library(ZRuntimeLib SHARED
         ${CMAKE_SOURCE_DIR}/include/Types.h
         ${CMAKE_SOURCE_DIR}/include/Error.h
         ${CMAKE_SOURCE_DIR}/include/Execute.h
-        ${CMAKE_SOURCE_DIR}/src/Error.c
+        ${CMAKE_SOURCE_DIR}/include/FileStream.h
+        ${CMAKE_SOURCE_DIR}/include/Opcode.h
         ${CMAKE_SOURCE_DIR}/src/Execute.c
+        ${CMAKE_SOURCE_DIR}/src/FileStream.c
+        ${CMAKE_SOURCE_DIR}/src/Opcode.c
 )
 
 # Rename the Z Runtime Library
@@ -64,8 +67,11 @@ add_executable(ZRuntimeExe
         ${CMAKE_SOURCE_DIR}/include/Types.h
         ${CMAKE_SOURCE_DIR}/include/Error.h
         ${CMAKE_SOURCE_DIR}/include/Execute.h
-        ${CMAKE_SOURCE_DIR}/src/Error.c
+        ${CMAKE_SOURCE_DIR}/include/FileStream.h
+        ${CMAKE_SOURCE_DIR}/include/Opcode.h
         ${CMAKE_SOURCE_DIR}/src/Execute.c
+        ${CMAKE_SOURCE_DIR}/src/FileStream.c
+        ${CMAKE_SOURCE_DIR}/src/Opcode.c
         ${CMAKE_SOURCE_DIR}/main.c
 )
 

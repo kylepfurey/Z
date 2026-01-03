@@ -6,5 +6,9 @@
 
 /** Executes a Z program. */
 int main(int argc, char *argv[]) {
-    return 0;
+    if (argc == 0) {
+        ZError("No file was given!");
+        return ZLANG_ERROR;
+    }
+    return ZExecute(argv[argc - 1]);
 }

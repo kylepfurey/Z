@@ -1,5 +1,5 @@
 // .h
-// Z External Libraries
+// Z External Library Includes
 // by Kyle Furey
 
 #ifndef ZLANG_EXTERNAL_H
@@ -12,6 +12,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
+#include <math.h>
+#include <time.h>
+#include <assert.h>
 
 // EXTERNAL LIBRARIES
 #include <ffi.h>

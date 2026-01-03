@@ -16,28 +16,28 @@ extern "C" {
 typedef bool ZBool;
 
 /** An 8-bit signed integral number. */
-typedef int8_t ZInt8;
+typedef int8_t ZSByte;
 
 /** An 8-bit unsigned integral number. */
-typedef uint8_t ZUInt8;
+typedef uint8_t ZByte;
 
 /** A 16-bit signed integral number. */
-typedef int16_t ZInt16;
+typedef int16_t ZShort;
 
 /** A 16-bit unsigned integral number. */
-typedef uint16_t ZUInt16;
+typedef uint16_t ZUShort;
 
 /** A 32-bit signed integral number. */
-typedef int32_t ZInt32;
+typedef int32_t ZInt;
 
 /** A 32-bit unsigned integral number. */
-typedef uint32_t ZUInt32;
+typedef uint32_t ZUInt;
 
 /** A 64-bit signed integral number. */
-typedef int64_t ZInt64;
+typedef int64_t ZLong;
 
 /** A 64-bit unsigned integral number. */
-typedef uint64_t ZUInt64;
+typedef uint64_t ZULong;
 
 /** An unsigned integral number that can represent any size. */
 typedef size_t ZSize;

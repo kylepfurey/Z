@@ -1,5 +1,5 @@
 // .h
-// Z Runtime Library
+// Z Runtime Library Includes
 // by Kyle Furey
 
 #ifndef ZLANG_H
@@ -11,5 +11,7 @@
 #include <Types.h>
 #include <Error.h>
 #include <Execute.h>
+#include <FileStream.h>
+#include <Opcode.h>
 
 #endif // ZLANG_H

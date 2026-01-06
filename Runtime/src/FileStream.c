@@ -74,6 +74,18 @@ success:
     return true;
 }
 
+/** Outputs the current byte of a file stream. */
+ZBool ZFileCurrent(ZFileStream *file_stream, ZByte *byte) {
+    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
+    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
+    ZAssert(byte != NULL, "<byte> was NULL!");
+    if (file_stream->index >= file_stream->size) {
+        return false;
+    }
+    *byte = file_stream->chunk[file_stream->index];
+    return true;
+}
+
 /** Outputs the next byte of a file stream, iterating chunks when needed. */
 ZBool ZFileNext(ZFileStream *file_stream, ZByte *byte) {
     ZAssert(file_stream != NULL, "<file_stream> was NULL!");
@@ -88,6 +100,19 @@ ZBool ZFileNext(ZFileStream *file_stream, ZByte *byte) {
         ++file_stream->chunk_index;
         file_stream->size = fread(file_stream->chunk, 1, ZLANG_CHUNK_SIZE, file_stream->file);
         if (file_stream->size == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/** Outputs an array of bytes from a file stream, iterating chunks when needed. */
+ZBool ZFileArray(ZFileStream *file_stream, ZSize size, ZByte *array) {
+    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
+    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
+    ZAssert(array != NULL, "<array> was NULL!");
+    for (; size > 0; --size) {
+        if (!ZFileNext(file_stream, array++)) {
             return false;
         }
     }

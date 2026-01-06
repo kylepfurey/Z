@@ -24,6 +24,18 @@ ZBool ZBytesLoad(ZSize size, const ZByte *array, ZByteStream *byte_stream) {
     return true;
 }
 
+/** Outputs the current byte of a byte stream. */
+ZBool ZBytesCurrent(ZByteStream *byte_stream, ZByte *byte) {
+    ZAssert(byte_stream != NULL, "<byte_stream> was NULL!");
+    ZAssert(byte_stream->array != NULL, "<byte_stream>'s array was NULL!");
+    ZAssert(byte != NULL, "<byte> was NULL!");
+    if (byte_stream->index >= byte_stream->size) {
+        return false;
+    }
+    *byte = byte_stream->array[byte_stream->index];
+    return true;
+}
+
 /** Outputs the next byte of a byte stream. */
 ZBool ZBytesNext(ZByteStream *byte_stream, ZByte *byte) {
     ZAssert(byte_stream != NULL, "<byte_stream> was NULL!");
@@ -34,6 +46,19 @@ ZBool ZBytesNext(ZByteStream *byte_stream, ZByte *byte) {
     }
     *byte = byte_stream->array[byte_stream->index++];
     return byte_stream->index < byte_stream->size;
+}
+
+/** Outputs an array of bytes from a byte stream. */
+ZBool ZBytesArray(ZByteStream *byte_stream, ZSize size, ZByte *array) {
+    ZAssert(byte_stream != NULL, "<byte_stream> was NULL!");
+    ZAssert(byte_stream->array != NULL, "<byte_stream>'s array was NULL!");
+    ZAssert(array != NULL, "<array> was NULL!");
+    for (; size > 0; --size) {
+        if (!ZBytesNext(byte_stream, array++)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /** Jumps to the given byte index in a byte stream. */

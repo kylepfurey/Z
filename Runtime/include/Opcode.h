@@ -5,6 +5,10 @@
 #ifndef ZLANG_OPCODE_H
 #define ZLANG_OPCODE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** Z language runtime opcodes. */
 typedef enum {
     /** Magic number for start and end of file. */
@@ -19,5 +23,9 @@ typedef enum {
      */
     ZOPCODE_EXIT = 'E',
 } ZOpcode;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // ZLANG_OPCODE_H

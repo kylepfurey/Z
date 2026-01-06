@@ -64,3 +64,9 @@ ZBool ZStackSet(ZStack *stack, ZIndex index, ZIndex size, const ZByte *data) {
     memmove(stack->bottom + index, data, size);
     return true;
 }
+
+/** Returns the current size of the stack. */
+ZLANG_API ZSize ZStackSize(const ZStack *stack) {
+    ZAssert(stack != NULL, "<stack> was NULL!");
+    return (ZSize) (stack->top - stack->bottom);
+}

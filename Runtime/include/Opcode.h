@@ -25,7 +25,22 @@ typedef enum {
 
     /** Pops data from the stack. */
     ZOPCODE_POP = 'p',
+
+    /** Indicates the following number is a stack address. */
+    ZOPCODE_GET = '*',
+
+    /** Jumps to the following address. */
+    ZOPCODE_JUMP = 'J',
+
+    /** Pushes the current byte index and jumps. */
+    ZOPCODE_CALL = 'C',
 } ZOpcode;
+
+/** Processes a Z opcode in a file stream. */
+ZLANG_API ZBool ZProcessFileOpcode(ZFileStream *file_stream, ZStack *stack);
+
+/** Processes a Z opcode in a file stream. */
+ZLANG_API ZBool ZProcessBytesOpcode(ZByteStream *byte_stream, ZStack *stack);
 
 #ifdef __cplusplus
 }

@@ -4,8 +4,8 @@
 
 #include <ZLang.h>
 
-/** Loads a .zac or .zlib program from the given array of bytes into a byte stream. */
-ZBool ZBytesLoad(ZSize size, const ZByte *array, ZByteStream *byte_stream) {
+/** Initializes a .zac or .zlib program from the given array of bytes into a byte stream. */
+ZBool ZBytesInit(ZSize size, const ZByte *array, ZByteStream *byte_stream) {
     ZAssert(array != NULL, "<path> was NULL!");
     ZAssert(byte_stream != NULL, "<byte_stream> was NULL!");
     if (size == 0 || array[0] != ZOPCODE_MAGIC) {
@@ -83,11 +83,4 @@ ZBool ZBytesJump(ZByteStream *byte_stream, ZIndex index) {
 ZIndex ZBytesIndex(const ZByteStream *byte_stream) {
     ZAssert(byte_stream != NULL, "<byte_stream> was NULL!");
     return byte_stream->index;
-}
-
-/** Closes a byte stream. */
-void ZBytesClose(ZByteStream *byte_stream) {
-    ZAssert(byte_stream != NULL, "<byte_stream> was NULL!");
-    ZAssert(byte_stream->array != NULL, "<byte_stream>'s array was NULL!");
-    byte_stream->array = NULL;
 }

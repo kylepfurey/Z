@@ -41,6 +41,9 @@ ZLANG_API const void *ZStackGetConst(const ZStack *stack, ZIndex index, ZIndex s
 /** Sets the stack data at the given index. */
 ZLANG_API ZBool ZStackSet(ZStack *stack, ZIndex index, ZIndex size, const ZByte *data);
 
+/** Returns the current size of the stack. */
+ZLANG_API ZSize ZStackSize(const ZStack *stack);
+
 #ifdef __cplusplus
 }
 #endif

@@ -19,13 +19,13 @@ typedef enum {
      * The first 32-bit integer on the stack is always the return code.
      */
     ZOPCODE_EXIT = 'E',
-
-    /** Pushes data to the stack. */
-    ZOPCODE_PUSH = 'P',
-
-    /** Pops data from the stack. */
-    ZOPCODE_POP = 'p',
 } ZOpcode;
+
+/** Processes a Z opcode in a file stream. */
+ZLANG_API ZBool ZProcessFileOpcode(ZFileStream *file_stream, ZStack *stack);
+
+/** Processes a Z opcode in a file stream. */
+ZLANG_API ZBool ZProcessBytesOpcode(ZByteStream *byte_stream, ZStack *stack);
 
 #ifdef __cplusplus
 }

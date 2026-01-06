@@ -11,6 +11,9 @@
 extern "C" {
 #endif
 
+/** Outputs a value-sized number of bytes from a byte stream. */
+#define ZBytesNextValue(byte_stream, value) ZBytesNextArray((byte_stream), sizeof(*(value)), (ZByte *) (value))
+
 /** A handle to an array of bytes used to iterate its memory. */
 typedef struct {
     /** The iterated array of bytes. */
@@ -23,8 +26,8 @@ typedef struct {
     ZSize size;
 } ZByteStream;
 
-/** Loads a .zac or .zlib program from the given array of bytes into a byte stream. */
-ZLANG_API ZBool ZBytesLoad(ZSize size, const ZByte *array, ZByteStream *byte_stream);
+/** Initializes a .zac or .zlib program from the given array of bytes into a byte stream. */
+ZLANG_API ZBool ZBytesInit(ZSize size, const ZByte *array, ZByteStream *byte_stream);
 
 /** Outputs the current byte of a byte stream. */
 ZLANG_API ZBool ZBytesCurrent(ZByteStream *byte_stream, ZByte *byte);
@@ -35,17 +38,11 @@ ZLANG_API ZBool ZBytesNext(ZByteStream *byte_stream, ZByte *byte);
 /** Outputs an array of bytes from a byte stream. */
 ZLANG_API ZBool ZBytesNextArray(ZByteStream *byte_stream, ZSize size, ZByte *array);
 
-/** Outputs a value-sized number of bytes from a byte stream. */
-#define ZBytesNextValue(byte_stream, value) ZBytesNextArray((byte_stream), sizeof(*(value)), (ZByte *) (value))
-
 /** Jumps to the given byte index in a byte stream. */
 ZLANG_API ZBool ZBytesJump(ZByteStream *byte_stream, ZIndex index);
 
 /** Returns the current byte index of a byte stream. */
 ZLANG_API ZIndex ZBytesIndex(const ZByteStream *byte_stream);
-
-/** Closes a byte stream. */
-ZLANG_API void ZBytesClose(ZByteStream *byte_stream);
 
 #ifdef __cplusplus
 }

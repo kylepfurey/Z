@@ -12,6 +12,7 @@
 #include <Error.h>
 #include <Execute.h>
 #include <FileStream.h>
+#include <ByteStream.h>
 #include <Opcode.h>
 
 #endif // ZLANG_H

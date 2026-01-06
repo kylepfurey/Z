@@ -2,8 +2,8 @@
 // Z File Operation Functions
 // by Kyle Furey
 
-#ifndef ZLANG_FILE_H
-#define ZLANG_FILE_H
+#ifndef ZLANG_FILESTREAM_H
+#define ZLANG_FILESTREAM_H
 
 #include <Types.h>
 
@@ -32,7 +32,7 @@ typedef struct {
     FILE *file;
 } ZFileStream;
 
-/** Loads a .zac or .zlib file at the given path into a file stream. */
+/** Loads a .zac or .zlib program at the given path into a file stream. */
 ZLANG_API ZBool ZFileLoad(ZString path, ZFileStream *file_stream);
 
 /** Outputs the next byte of a file stream, iterating chunks when needed. */
@@ -51,4 +51,4 @@ ZLANG_API void ZFileClose(ZFileStream *file_stream);
 }
 #endif
 
-#endif // ZLANG_FILE_H
+#endif // ZLANG_FILESTREAM_H

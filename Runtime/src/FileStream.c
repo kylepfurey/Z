@@ -4,10 +4,10 @@
 
 #include <ZLang.h>
 
-/** Loads a .zac or .zlib file at the given path into a file stream. */
+/** Loads a .zac or .zlib program at the given path into a file stream. */
 ZBool ZFileLoad(ZString path, ZFileStream *file_stream) {
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
     ZAssert(path != NULL, "<path> was NULL!");
+    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
     ZDiff length = (ZDiff) strlen(path);
     if (length <= 0) {
         ZError("Invalid path!");
@@ -74,7 +74,7 @@ success:
     return true;
 }
 
-/** Iterates each byte of a file in chunks. */
+/** Outputs the next byte of a file stream, iterating chunks when needed. */
 ZBool ZFileNext(ZFileStream *file_stream, ZByte *byte) {
     ZAssert(file_stream != NULL, "<file_stream> was NULL!");
     ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
@@ -109,13 +109,13 @@ ZBool ZFileJump(ZFileStream *file_stream, ZIndex index) {
 }
 
 /** Returns the current byte index of a file stream. */
-ZLANG_API ZIndex ZFileIndex(const ZFileStream *file_stream) {
+ZIndex ZFileIndex(const ZFileStream *file_stream) {
     ZAssert(file_stream != NULL, "<file_stream> was NULL!");
     return (file_stream->chunk_index * ZLANG_CHUNK_SIZE) + file_stream->index;
 }
 
 /** Closes a file stream. */
-ZLANG_API void ZFileClose(ZFileStream *file_stream) {
+void ZFileClose(ZFileStream *file_stream) {
     ZAssert(file_stream != NULL, "<file_stream> was NULL!");
     ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
     fclose(file_stream->file);

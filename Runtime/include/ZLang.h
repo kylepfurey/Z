@@ -13,6 +13,7 @@
 #include <Execute.h>
 #include <FileStream.h>
 #include <ByteStream.h>
+#include <Stack.h>
 #include <Opcode.h>
 
 #endif // ZLANG_H

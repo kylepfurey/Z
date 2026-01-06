@@ -12,17 +12,38 @@ ZInt ZExecuteFile(ZString path) {
         ZError("Could not load file!");
         return ZLANG_ERROR;
     }
-    ZInt result = 0; // TODO - ZStack
+    ZStack stack;
+    ZAssert(ZStackInit(sizeof(ZInt), &stack), "Stack initialization error!");
     ZByte byte;
+    ZUShort num;
+    ZInt result;
     while (ZFileNext(&main, &byte)) {
-        if (byte == ZOPCODE_NOOP) {
-            continue;
+        ZLog("%p - %c", (void *) (ZFileIndex(&main) - 1), byte); // TODO - ZOpcodes
+        switch (byte) {
+            case ZOPCODE_EXIT:
+                goto exit;
+            case ZOPCODE_PUSH:
+                if (!ZFileNextValue(&main, &num) || !ZStackPush(&stack, num)) {
+                    ZError("Runtime error!");
+                    result = ZLANG_ERROR;
+                    goto error;
+                }
+                break;
+            case ZOPCODE_POP:
+                if (!ZFileNextValue(&main, &num) || !ZStackPop(&stack, num)) {
+                    ZError("Runtime error!");
+                    result = ZLANG_ERROR;
+                    goto error;
+                }
+                break;
+            default:
+                break;
         }
-        if (byte == ZOPCODE_EXIT) {
-            break;
-        }
-        ZLog("%p - %c", (ZPtr) (ZFileIndex(&main) - 1), byte); // TODO - ZOpcodes
     }
+    ZError("No exit byte!");
+exit:
+    result = *(ZInt *) stack.bottom;
+error:
     ZFileClose(&main);
     return result;
 }
@@ -35,17 +56,38 @@ ZInt ZExecuteBytes(ZSize size, const ZByte *array) {
         ZError("Could not load byte array!");
         return ZLANG_ERROR;
     }
-    ZInt result = 0; // TODO - ZStack
+    ZStack stack;
+    ZAssert(ZStackInit(sizeof(ZInt), &stack), "Stack initialization error!");
     ZByte byte;
+    ZUShort num;
+    ZInt result;
     while (ZBytesNext(&main, &byte)) {
-        if (byte == ZOPCODE_NOOP) {
-            continue;
+        ZLog("%p - %c", (void *) (ZBytesIndex(&main) - 1), byte); // TODO - ZOpcodes
+        switch (byte) {
+            case ZOPCODE_EXIT:
+                goto exit;
+            case ZOPCODE_PUSH:
+                if (!ZBytesNextValue(&main, &num) || !ZStackPush(&stack, num)) {
+                    ZError("Runtime error!");
+                    result = ZLANG_ERROR;
+                    goto error;
+                }
+                break;
+            case ZOPCODE_POP:
+                if (!ZBytesNextValue(&main, &num) || !ZStackPop(&stack, num)) {
+                    ZError("Runtime error!");
+                    result = ZLANG_ERROR;
+                    goto error;
+                }
+                break;
+            default:
+                break;
         }
-        if (byte == ZOPCODE_EXIT) {
-            break;
-        }
-        ZLog("%p - %c", (ZPtr) (ZBytesIndex(&main) - 1), byte); // TODO - ZOpcodes
     }
+    ZError("No exit byte!");
+exit:
+    result = *(ZInt *) stack.bottom;
+error:
     ZBytesClose(&main);
     return result;
 }

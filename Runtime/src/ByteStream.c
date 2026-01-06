@@ -49,13 +49,23 @@ ZBool ZBytesNext(ZByteStream *byte_stream, ZByte *byte) {
 }
 
 /** Outputs an array of bytes from a byte stream. */
-ZBool ZBytesArray(ZByteStream *byte_stream, ZSize size, ZByte *array) {
+ZBool ZBytesNextArray(ZByteStream *byte_stream, ZSize size, ZByte *array) {
     ZAssert(byte_stream != NULL, "<byte_stream> was NULL!");
     ZAssert(byte_stream->array != NULL, "<byte_stream>'s array was NULL!");
     ZAssert(array != NULL, "<array> was NULL!");
-    for (; size > 0; --size) {
-        if (!ZBytesNext(byte_stream, array++)) {
-            return false;
+    ZInt endian = 1;
+    if (*(ZByte *) &endian == 1) {
+        for (; size > 0; --size) {
+            if (!ZBytesNext(byte_stream, array++)) {
+                return false;
+            }
+        }
+    } else {
+        array += size;
+        for (; size > 0; --size) {
+            if (!ZBytesNext(byte_stream, --array)) {
+                return false;
+            }
         }
     }
     return true;

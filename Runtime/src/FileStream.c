@@ -107,13 +107,23 @@ ZBool ZFileNext(ZFileStream *file_stream, ZByte *byte) {
 }
 
 /** Outputs an array of bytes from a file stream, iterating chunks when needed. */
-ZBool ZFileArray(ZFileStream *file_stream, ZSize size, ZByte *array) {
+ZBool ZFileNextArray(ZFileStream *file_stream, ZSize size, ZByte *array) {
     ZAssert(file_stream != NULL, "<file_stream> was NULL!");
     ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
     ZAssert(array != NULL, "<array> was NULL!");
-    for (; size > 0; --size) {
-        if (!ZFileNext(file_stream, array++)) {
-            return false;
+    ZInt endian = 1;
+    if (*(ZByte *) &endian == 1) {
+        for (; size > 0; --size) {
+            if (!ZFileNext(file_stream, array++)) {
+                return false;
+            }
+        }
+    } else {
+        array += size;
+        for (; size > 0; --size) {
+            if (!ZFileNext(file_stream, --array)) {
+                return false;
+            }
         }
     }
     return true;

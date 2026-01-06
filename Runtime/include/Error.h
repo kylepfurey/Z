@@ -16,7 +16,7 @@
 #ifdef ZLANG_DEBUG
 /** Logs a message to the Z runtime when debugging. */
 #define ZLog(...)\
-do { fprintf(stdout, "Z LOG: "); fprintf(stdout, __VA_ARGS__); fprintf(stdout, "\n"); } while (false)
+do { fprintf(stdout, "Z LOG:\t\t"); fprintf(stdout, __VA_ARGS__); fprintf(stdout, "\n"); } while (false)
 #else
 /** Noop. */
 #define ZLog(...) do {} while(false)
@@ -25,7 +25,7 @@ do { fprintf(stdout, "Z LOG: "); fprintf(stdout, __VA_ARGS__); fprintf(stdout, "
 #ifdef ZLANG_DEBUG
 /** Logs an error to the Z runtime when debugging. */
 #define ZError(...)\
-do { fprintf(stderr, "Z ERROR: "); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } while (false)
+do { fprintf(stderr, "Z ERROR:\t"); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } while (false)
 #else
 /** Noop. */
 #define ZError(...) do {} while(false)
@@ -37,7 +37,7 @@ do { fprintf(stderr, "Z ERROR: "); fprintf(stderr, __VA_ARGS__); fprintf(stderr,
 if (!(cond))\
 fprintf(\
     stderr,\
-    "Z ASSERTION FAILED: Func %s() - Line %i - %s\n",\
+    "Z ASSERTION FAILED:\tFunc %s() - Line %i - %s\n",\
     __func__,\
     __LINE__,\
     (msg)\

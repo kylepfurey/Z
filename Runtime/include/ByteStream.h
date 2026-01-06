@@ -33,10 +33,10 @@ ZLANG_API ZBool ZBytesCurrent(ZByteStream *byte_stream, ZByte *byte);
 ZLANG_API ZBool ZBytesNext(ZByteStream *byte_stream, ZByte *byte);
 
 /** Outputs an array of bytes from a byte stream. */
-ZLANG_API ZBool ZBytesArray(ZByteStream *byte_stream, ZSize size, ZByte *array);
+ZLANG_API ZBool ZBytesNextArray(ZByteStream *byte_stream, ZSize size, ZByte *array);
 
 /** Outputs a value-sized number of bytes from a byte stream. */
-#define ZBytesValue(byte_stream, value) ZBytesNextArray(byte_stream, sizeof(*value), (ZByte *) value)
+#define ZBytesNextValue(byte_stream, value) ZBytesNextArray((byte_stream), sizeof(*(value)), (ZByte *) (value))
 
 /** Jumps to the given byte index in a byte stream. */
 ZLANG_API ZBool ZBytesJump(ZByteStream *byte_stream, ZIndex index);

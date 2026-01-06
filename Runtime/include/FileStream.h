@@ -42,10 +42,10 @@ ZLANG_API ZBool ZFileCurrent(ZFileStream *file_stream, ZByte *byte);
 ZLANG_API ZBool ZFileNext(ZFileStream *file_stream, ZByte *byte);
 
 /** Outputs an array of bytes from a file stream, iterating chunks when needed. */
-ZLANG_API ZBool ZFileArray(ZFileStream *file_stream, ZSize size, ZByte *array);
+ZLANG_API ZBool ZFileNextArray(ZFileStream *file_stream, ZSize size, ZByte *array);
 
 /** Outputs a value-sized number of bytes from a file stream, iterating chunks when needed. */
-#define ZFileValue(file_stream, value) ZFileNextArray(file_stream, sizeof(*value), (ZByte *) value)
+#define ZFileNextValue(file_stream, value) ZFileNextArray((file_stream), sizeof(*(value)), (ZByte *) (value))
 
 /** Jumps to the given byte index in a file stream. */
 ZLANG_API ZBool ZFileJump(ZFileStream *file_stream, ZIndex index);

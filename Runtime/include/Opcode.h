@@ -14,14 +14,17 @@ typedef enum {
     /** Magic number for start and end of file. */
     ZOPCODE_MAGIC = 'Z',
 
-    /** Does nothing. */
-    ZOPCODE_NOOP = '\n',
-
     /**
      * Exits the program immediately.
      * The first 32-bit integer on the stack is always the return code.
      */
     ZOPCODE_EXIT = 'E',
+
+    /** Pushes data to the stack. */
+    ZOPCODE_PUSH = 'P',
+
+    /** Pops data from the stack. */
+    ZOPCODE_POP = 'p',
 } ZOpcode;
 
 #ifdef __cplusplus

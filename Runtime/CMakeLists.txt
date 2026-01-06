@@ -27,10 +27,12 @@ add_library(ZRuntimeLib SHARED
         ${CMAKE_SOURCE_DIR}/include/Execute.h
         ${CMAKE_SOURCE_DIR}/include/FileStream.h
         ${CMAKE_SOURCE_DIR}/include/ByteStream.h
+        ${CMAKE_SOURCE_DIR}/include/Stack.h
         ${CMAKE_SOURCE_DIR}/include/Opcode.h
         ${CMAKE_SOURCE_DIR}/src/Execute.c
         ${CMAKE_SOURCE_DIR}/src/FileStream.c
         ${CMAKE_SOURCE_DIR}/src/ByteStream.c
+        ${CMAKE_SOURCE_DIR}/src/Stack.c
         ${CMAKE_SOURCE_DIR}/src/Opcode.c
 )
 
@@ -71,10 +73,12 @@ add_executable(ZRuntimeExe
         ${CMAKE_SOURCE_DIR}/include/Execute.h
         ${CMAKE_SOURCE_DIR}/include/FileStream.h
         ${CMAKE_SOURCE_DIR}/include/ByteStream.h
+        ${CMAKE_SOURCE_DIR}/include/Stack.h
         ${CMAKE_SOURCE_DIR}/include/Opcode.h
         ${CMAKE_SOURCE_DIR}/src/Execute.c
         ${CMAKE_SOURCE_DIR}/src/FileStream.c
         ${CMAKE_SOURCE_DIR}/src/ByteStream.c
+        ${CMAKE_SOURCE_DIR}/src/Stack.c
         ${CMAKE_SOURCE_DIR}/src/Opcode.c
         ${CMAKE_SOURCE_DIR}/main.c
 )

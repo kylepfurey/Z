@@ -1,5 +1,5 @@
 ﻿// .cs
-// Z Compiler Entry Point
+// Z Entry Point
 // by Kyle Furey
 
 using System;
@@ -14,9 +14,9 @@ using ZLang;
 /** The class that contains the Main() function. */
 public static class Program
 {
-	/** Compiles a Z executable or library. */
-	public static int Main(params string[] args)
-	{
-		return 0;
-	}
+    /** Compiles a Z assembly, executable, or library. */
+    public static int Main(params string[] args)
+    {
+        return 0;
+    }
 }

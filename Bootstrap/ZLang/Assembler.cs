@@ -1,5 +1,5 @@
 // .cs
-// Z Bytecode Output Class
+// Z Assembler Functions
 // by Kyle Furey
 
 using System;
@@ -12,13 +12,9 @@ using System.Threading.Tasks;
 
 namespace ZLang
 {
-	/** Stores and exports executable Z bytecode. */
-	public sealed class Bytecode
-	{
-		/** Constructor. */
-		public Bytecode()
-		{
-
-		}
-	}
+    /** Static functions for the Z assembler. */
+    public static class Assembler
+    {
+        
+    }
 }

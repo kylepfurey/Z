@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace ZLang
 {
-	/** Static functions for the Z compiler. */
-	public static class Compiler
-	{
-
-	}
+    /** Static functions for the Z compiler. */
+    public static class Compiler
+    {
+        
+    }
 }

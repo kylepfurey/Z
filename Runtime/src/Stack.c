@@ -34,35 +34,14 @@ ZBool ZStackPop(ZStack *stack, ZSize size) {
     return true;
 }
 
-/** Returns a pointer to the stack data at the given index. */
-void *ZStackGet(ZStack *stack, ZIndex index, ZIndex size) {
+/** Returns a pointer to the stack data at the given offset. */
+void *ZStackPeek(ZStack *stack, ZIndex offset) {
     ZAssert(stack != NULL, "<stack> was NULL!");
-    if (index + size >= (ZIndex) (stack->top - stack->bottom)) {
-        ZError("Invalid stack index!");
+    if (offset > (stack->top - stack->bottom)) {
+        ZError("Invalid stack offset!");
         return NULL;
     }
-    return stack->bottom + index;
-}
-
-/** Returns a pointer to the stack data at the given index. */
-const void *ZStackGetConst(const ZStack *stack, ZIndex index, ZIndex size) {
-    ZAssert(stack != NULL, "<stack> was NULL!");
-    if (index + size >= (ZIndex) (stack->top - stack->bottom)) {
-        ZError("Invalid stack index!");
-        return NULL;
-    }
-    return stack->bottom + index;
-}
-
-/** Sets the stack data at the given index. */
-ZBool ZStackSet(ZStack *stack, ZIndex index, ZIndex size, const ZByte *data) {
-    ZAssert(stack != NULL, "<stack> was NULL!");
-    if (index + size >= (ZIndex) (stack->top - stack->bottom)) {
-        ZError("Invalid stack index!");
-        return false;
-    }
-    memmove(stack->bottom + index, data, size);
-    return true;
+    return stack->top - offset;
 }
 
 /** Returns the current size of the stack. */

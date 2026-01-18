@@ -14,9 +14,6 @@ extern "C" {
 /** The size of a single file chunk loaded into memory. */
 #define ZLANG_CHUNK_SIZE 1024
 
-/** Outputs a value-sized number of bytes from a file stream, iterating chunks when needed. */
-#define ZFileNextValue(file_stream, value) ZFileNextArray((file_stream), sizeof(*(value)), (ZByte *) (value))
-
 /** A handle to a file used to iterate its memory in chunks. */
 typedef struct {
     /** The file chunk buffer. */
@@ -42,10 +39,13 @@ ZLANG_API ZBool ZFileLoad(ZString path, ZFileStream *file_stream);
 ZLANG_API ZBool ZFileCurrent(ZFileStream *file_stream, ZByte *byte);
 
 /** Outputs the next byte of a file stream, iterating chunks when needed. */
-ZLANG_API ZBool ZFileNext(ZFileStream *file_stream, ZByte *byte);
+ZLANG_API ZBool ZFileNextByte(ZFileStream *file_stream, ZByte *byte);
 
 /** Outputs an array of bytes from a file stream, iterating chunks when needed. */
 ZLANG_API ZBool ZFileNextArray(ZFileStream *file_stream, ZSize size, ZByte *array);
+
+/** Outputs an 8-byte word from a file stream, iterating chunks when needed. */
+ZLANG_API ZBool ZFileNextWord(ZFileStream *file_stream, ZULong *word);
 
 /** Jumps to the given byte index in a file stream. */
 ZLANG_API ZBool ZFileJump(ZFileStream *file_stream, ZIndex index);

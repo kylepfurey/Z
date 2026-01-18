@@ -87,7 +87,7 @@ ZBool ZFileCurrent(ZFileStream *file_stream, ZByte *byte) {
 }
 
 /** Outputs the next byte of a file stream, iterating chunks when needed. */
-ZBool ZFileNext(ZFileStream *file_stream, ZByte *byte) {
+ZBool ZFileNextByte(ZFileStream *file_stream, ZByte *byte) {
     ZAssert(file_stream != NULL, "<file_stream> was NULL!");
     ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
     ZAssert(byte != NULL, "<byte> was NULL!");
@@ -114,19 +114,27 @@ ZBool ZFileNextArray(ZFileStream *file_stream, ZSize size, ZByte *array) {
     ZInt endian = 1;
     if (*(ZByte *) &endian == 1) {
         for (; size > 0; --size) {
-            if (!ZFileNext(file_stream, array++)) {
+            if (!ZFileNextByte(file_stream, array++)) {
                 return false;
             }
         }
     } else {
         array += size;
         for (; size > 0; --size) {
-            if (!ZFileNext(file_stream, --array)) {
+            if (!ZFileNextByte(file_stream, --array)) {
                 return false;
             }
         }
     }
     return true;
+}
+
+/** Outputs an 8-byte word from a file stream, iterating chunks when needed. */
+ZBool ZFileNextWord(ZFileStream *file_stream, ZULong *word) {
+    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
+    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
+    ZAssert(word != NULL, "<word> was NULL!");
+    return ZFileNextArray(file_stream, sizeof(ZULong), (ZByte *) word);
 }
 
 /** Jumps to the given byte index in a file stream. */

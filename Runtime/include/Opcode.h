@@ -1,31 +1,52 @@
 // .h
-// Z Opcode Enum and Functions
+// Z Opcode Structure and Functions
 // by Kyle Furey
 
 #ifndef ZLANG_OPCODE_H
 #define ZLANG_OPCODE_H
 
+#include <Types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** Z language runtime opcodes. */
+/** The values of each instruction bytecode. */
 typedef enum {
-    /** Magic number for start and end of file. */
+    /** The magic number for start and end of a file. */
     ZOPCODE_MAGIC = 'Z',
 
     /**
-     * Exits the program immediately.
-     * The first 32-bit integer on the stack is always the return code.
+     * Ends the program or kills the current coroutine immediately.
+     * The return value of main() will be the program's exit code.
      */
     ZOPCODE_EXIT = 'E',
 } ZOpcode;
 
-/** Processes a Z opcode in a file stream. */
-ZLANG_API ZBool ZProcessFileOpcode(ZFileStream *file_stream, ZStack *stack);
+/** A single instruction in the .zac file. */
+typedef struct {
+    /** The bytecode that defines what to do in this instruction. */
+    ZByte code;
 
-/** Processes a Z opcode in a file stream. */
-ZLANG_API ZBool ZProcessBytesOpcode(ZByteStream *byte_stream, ZStack *stack);
+    /** Bitflags detailing this instruction's operation. */
+    ZByte flags;
+
+    /** The offset from the top of the stack containing the first argument. */
+    ZUShort arg;
+
+    union {
+        /** A value containing a literal size. */
+        ZUInt size;
+
+        struct {
+            /** The offset from the top of the stack containing the left operand. */
+            ZUShort left;
+
+            /** The offset from the top of the stack containing the right operand. */
+            ZUShort right;
+        };
+    };
+} ZInstruction;
 
 #ifdef __cplusplus
 }

@@ -11,11 +11,17 @@
 extern "C" {
 #endif
 
-/** Executes a .zac file at the given path, returning 0 or an error code from the program. */
-ZLANG_API ZInt ZExecuteFile(ZString path);
+/** Contains the arguments of the program. */
+typedef struct {
+    /** The number of arguments passed to the program. */
+    ZUInt argc;
 
-/** Executes a .zac file in the given array of bytes, returning 0 or an error code from the program. */
-ZLANG_API ZInt ZExecuteBytes(ZSize size, const ZByte *array);
+    /** The arguments passed to the program as an array of strings. */
+    ZString *argv;
+} ZArgs;
+
+/** Executes a .zac file at the given path, returning 0 or an error code from the program. */
+ZLANG_API ZInt ZExecute(ZString path, ZArgs args);
 
 #ifdef __cplusplus
 }

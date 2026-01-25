@@ -39,18 +39,6 @@ typedef int64_t ZLong;
 /** A 64-bit unsigned integral number. */
 typedef uint64_t ZULong;
 
-/** An unsigned integral number that can represent any size. */
-typedef size_t ZSize;
-
-/** An unsigned integral number that represents the index of some data. */
-typedef ZSize ZIndex;
-
-/** A signed integral number that represents the difference between some data. */
-typedef ptrdiff_t ZDiff;
-
-/** An unsigned integral number that represents the address of some data. */
-typedef uintptr_t ZPtr;
-
 /** A 32-bit floating-point decimal number. */
 typedef float ZFloat;
 

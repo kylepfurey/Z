@@ -1,24 +1,29 @@
 // .h
-// Z Coroutine Structure and Functions
+// Z Coroutine Class
 // by Kyle Furey
 
 #ifndef ZLANG_COROUTINE_H
 #define ZLANG_COROUTINE_H
 
-#include <FileStream.h>
 #include <Stack.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/** A single coroutine and the file it is executing. */
-typedef struct {
-    /** This coroutine's file stream. */
-    ZFileStream file_stream;
+/** The number of milliseconds a coroutine is alloted before context-switching. */
+#define ZLANG_COROUTINE_DELAY_MS 100
 
-    /** This coroutine's stack. */
+/** A single coroutine containing a stack and file address. */
+typedef struct {
+    /** This coroutine's stack space. */
     ZStack stack;
+
+    /** This coroutine's current global file address. */
+    ZULong fileAddress;
+
+    /** The delay in milliseconds before resuming this coroutine. */
+    ZUInt delayMs;
 } ZCoroutine;
 
 #ifdef __cplusplus

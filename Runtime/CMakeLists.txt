@@ -25,15 +25,21 @@ add_library(ZRuntimeLib SHARED
         ${CMAKE_SOURCE_DIR}/include/Types.h
         ${CMAKE_SOURCE_DIR}/include/Error.h
         ${CMAKE_SOURCE_DIR}/include/Execute.h
+        ${CMAKE_SOURCE_DIR}/include/Program.h
+        ${CMAKE_SOURCE_DIR}/include/Coroutine.h
         ${CMAKE_SOURCE_DIR}/include/FileStream.h
         ${CMAKE_SOURCE_DIR}/include/Stack.h
-        ${CMAKE_SOURCE_DIR}/include/Coroutine.h
         ${CMAKE_SOURCE_DIR}/include/Opcode.h
+        ${CMAKE_SOURCE_DIR}/include/STD.h
+        ${CMAKE_SOURCE_DIR}/include/FFI.h
         ${CMAKE_SOURCE_DIR}/src/Execute.c
+        ${CMAKE_SOURCE_DIR}/src/Program.c
+        ${CMAKE_SOURCE_DIR}/src/Coroutine.c
         ${CMAKE_SOURCE_DIR}/src/FileStream.c
         ${CMAKE_SOURCE_DIR}/src/Stack.c
-        ${CMAKE_SOURCE_DIR}/src/Coroutine.c
         ${CMAKE_SOURCE_DIR}/src/Opcode.c
+        ${CMAKE_SOURCE_DIR}/src/STD.c
+        ${CMAKE_SOURCE_DIR}/src/FFI.c
 )
 
 # Rename the Z Runtime Library
@@ -71,15 +77,21 @@ add_executable(ZRuntimeExe
         ${CMAKE_SOURCE_DIR}/include/Types.h
         ${CMAKE_SOURCE_DIR}/include/Error.h
         ${CMAKE_SOURCE_DIR}/include/Execute.h
+        ${CMAKE_SOURCE_DIR}/include/Program.h
+        ${CMAKE_SOURCE_DIR}/include/Coroutine.h
         ${CMAKE_SOURCE_DIR}/include/FileStream.h
         ${CMAKE_SOURCE_DIR}/include/Stack.h
-        ${CMAKE_SOURCE_DIR}/include/Coroutine.h
         ${CMAKE_SOURCE_DIR}/include/Opcode.h
+        ${CMAKE_SOURCE_DIR}/include/STD.h
+        ${CMAKE_SOURCE_DIR}/include/FFI.h
         ${CMAKE_SOURCE_DIR}/src/Execute.c
+        ${CMAKE_SOURCE_DIR}/src/Program.c
+        ${CMAKE_SOURCE_DIR}/src/Coroutine.c
         ${CMAKE_SOURCE_DIR}/src/FileStream.c
         ${CMAKE_SOURCE_DIR}/src/Stack.c
-        ${CMAKE_SOURCE_DIR}/src/Coroutine.c
         ${CMAKE_SOURCE_DIR}/src/Opcode.c
+        ${CMAKE_SOURCE_DIR}/src/STD.c
+        ${CMAKE_SOURCE_DIR}/src/FFI.c
         ${CMAKE_SOURCE_DIR}/main.c
 )
 

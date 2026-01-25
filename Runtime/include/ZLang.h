@@ -11,9 +11,12 @@
 #include <Types.h>
 #include <Error.h>
 #include <Execute.h>
+#include <Program.h>
 #include <FileStream.h>
-#include <Stack.h>
 #include <Coroutine.h>
+#include <Stack.h>
 #include <Opcode.h>
+#include <STD.h>
+#include <FFI.h>
 
 #endif // ZLANG_H

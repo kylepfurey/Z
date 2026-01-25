@@ -10,5 +10,5 @@ int main(int argc, char *argv[]) {
         ZError("No file was given!");
         return ZLANG_ERROR;
     }
-    return ZExecute(argv[argc - 1], (ZArgs){argc - 1, (ZString *) argv + 1});
+    return Zexecute(argv[argc - 1], (ZArgs){argc - 1, (ZString *) argv + 1});
 }

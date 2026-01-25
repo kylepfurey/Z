@@ -1,5 +1,5 @@
 // .h
-// Z Opcode Structure and Functions
+// Z Opcode Functions
 // by Kyle Furey
 
 #ifndef ZLANG_OPCODE_H
@@ -11,42 +11,90 @@
 extern "C" {
 #endif
 
-/** The values of each instruction bytecode. */
-typedef enum {
-    /** The magic number for start and end of a file. */
+/** Each enumerated operation code. */
+enum {
     ZOPCODE_MAGIC = 'Z',
+    ZOPCODE_exit = 'E',
+    ZOPCODE_open = 'O',
+    ZOPCODE_load = 'L',
+    ZOPCODE_push = 'P',
+    ZOPCODE_pop = 'p',
+    ZOPCODE_mov = 'M',
+    ZOPCODE_set = 'S',
+    ZOPCODE_get = '{',
+    ZOPCODE_put = '}',
+    ZOPCODE_ptr = '$',
+    ZOPCODE_jmp = 'J',
+    ZOPCODE_hop = 'j',
+    ZOPCODE_call = 'C',
+    ZOPCODE_ret = 'R',
+    ZOPCODE_addr = '@',
+    ZOPCODE_eql = '=',
+    ZOPCODE_grtr = '\\',
+    ZOPCODE_flip = '!',
+    ZOPCODE_if = '?',
+    ZOPCODE_coro = '\t',
+    ZOPCODE_yld = '\n',
+    ZOPCODE_cncl = '\b',
+    ZOPCODE_kill = '\0',
+    ZOPCODE_inc = 'i',
+    ZOPCODE_dec = 'd',
+    ZOPCODE_add = '+',
+    ZOPCODE_sub = '-',
+    ZOPCODE_mult = '*',
+    ZOPCODE_div = '/',
+    ZOPCODE_mod = '%',
+    ZOPCODE_and = '&',
+    ZOPCODE_or = '|',
+    ZOPCODE_not = '~',
+    ZOPCODE_xor = '^',
+    ZOPCODE_lshf = '<',
+    ZOPCODE_rshf = '>',
+    ZOPCODE_std = 'c',
+    ZOPCODE_ffi = 'f',
+    ZOPCODE_TOTAL = 38,
+};
 
-    /**
-     * Ends the program or kills the current coroutine immediately.
-     * The return value of main() will be the program's exit code.
-     */
-    ZOPCODE_EXIT = 'E',
-} ZOpcode;
+/** Each bitflag value for an operation. */
+enum {
+    ZOPCODE_FLAGS_WRITE_LITERAL = 1,
+    ZOPCODE_FLAGS_READ_LITERAL = 2,
+    ZOPCODE_FLAGS_ARG_LITERAL = 4,
+    ZOPCODE_FLAGS_SIGNED = 8,
+    ZOPCODE_FLAGS_FLOAT = 16,
+    ZOPCODE_FLAGS_WIDTH_ONE = 32,
+    ZOPCODE_FLAGS_WIDTH_TWO = 64,
+    ZOPCODE_FLAGS_WIDTH_FOUR = 128,
+};
 
-/** A single instruction in the .zac file. */
+#pragma pack(push, 1)
+
+/** A single instruction for the Z runtime. */
 typedef struct {
-    /** The bytecode that defines what to do in this instruction. */
+    /** The enumerated operation for this instruction. */
     ZByte code;
 
-    /** Bitflags detailing this instruction's operation. */
+    /** Bitflags for this instruction. */
     ZByte flags;
 
-    /** The offset from the top of the stack containing the first argument. */
-    ZUShort arg;
-
     union {
-        /** A value containing a literal size. */
-        ZUInt size;
-
         struct {
-            /** The offset from the top of the stack containing the left operand. */
-            ZUShort left;
+            /** A stack offset used for writing. */
+            ZUInt write;
 
-            /** The offset from the top of the stack containing the right operand. */
-            ZUShort right;
+            /** A stack offset used for reading. */
+            ZUInt read;
         };
+
+        /** A large argument value for this instruction. */
+        ZULong size;
     };
-} ZInstruction;
+
+    /** A small argument value for this instruction. */
+    ZUShort arg;
+} __attribute__((packed)) ZOpcode;
+
+#pragma pack(pop)
 
 #ifdef __cplusplus
 }

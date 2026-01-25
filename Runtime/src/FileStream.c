@@ -1,14 +1,14 @@
 // .c
-// Z File Operation Functions
+// Z File Stream Class
 // by Kyle Furey
 
 #include <ZLang.h>
 
 /** Loads a .zac or .zlib program at the given path into a file stream. */
-ZBool ZFileLoad(ZString path, ZFileStream *file_stream) {
+ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong offset) {
     ZAssert(path != NULL, "<path> was NULL!");
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
-    ZDiff length = (ZDiff) strlen(path);
+    ZAssert(self != NULL, "<self> was NULL!");
+    ZLong length = (ZLong) strlen(path);
     if (length <= 0) {
         ZError("Invalid path!");
         return false;
@@ -47,16 +47,16 @@ success:
         ZError("File not found!");
         return false;
     }
-    file_stream->size = fread(file_stream->chunk, 1, ZLANG_CHUNK_SIZE, file);
-    if (file_stream->chunk[0] != ZOPCODE_MAGIC) {
+    self->chunkSize = fread(self->chunk, 1, ZLANG_CHUNK_SIZE, file);
+    if (self->chunk[0] != ZOPCODE_MAGIC) {
         fclose(file);
         ZError("File does not start with the Z byte!");
         return false;
     }
-    if (file_stream->size <= 1) {
+    if (self->chunkSize <= 1) {
         fclose(file);
         ZError(
-            file_stream->size == 0 ?
+            self->chunkSize == 0 ?
             "File does not start with the Z byte!" :
             "File does not end with the Z byte!"
         );
@@ -67,39 +67,42 @@ success:
         ZError("File does not end with the Z byte!");
         return false;
     }
+    fseek(file, 0, SEEK_END);
+    self->fileSize = ftell(file);
     fseek(file, ZLANG_CHUNK_SIZE, SEEK_SET);
-    file_stream->index = 1;
-    file_stream->chunk_index = 0;
-    file_stream->file = file;
+    self->byteIndex = 1;
+    self->chunkIndex = 0;
+    self->globalOffset = offset;
+    self->file = file;
     return true;
 }
 
 /** Outputs the current byte of a file stream. */
-ZBool ZFileCurrent(ZFileStream *file_stream, ZByte *byte) {
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
-    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
+ZBool ZFileStream_current(ZFileStream *self, ZByte *byte) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    ZAssert(self->file != NULL, "<self>'s FILE handle was NULL!");
     ZAssert(byte != NULL, "<byte> was NULL!");
-    if (file_stream->index >= file_stream->size) {
+    if (self->byteIndex >= self->chunkSize) {
         return false;
     }
-    *byte = file_stream->chunk[file_stream->index];
+    *byte = self->chunk[self->byteIndex];
     return true;
 }
 
 /** Outputs the next byte of a file stream, iterating chunks when needed. */
-ZBool ZFileNextByte(ZFileStream *file_stream, ZByte *byte) {
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
-    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
+ZBool ZFileStream_nextByte(ZFileStream *self, ZByte *byte) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    ZAssert(self->file != NULL, "<self>'s FILE handle was NULL!");
     ZAssert(byte != NULL, "<byte> was NULL!");
-    if (file_stream->index >= file_stream->size) {
+    if (self->byteIndex >= self->chunkSize) {
         return false;
     }
-    *byte = file_stream->chunk[file_stream->index++];
-    if (file_stream->index == file_stream->size) {
-        file_stream->index = 0;
-        ++file_stream->chunk_index;
-        file_stream->size = fread(file_stream->chunk, 1, ZLANG_CHUNK_SIZE, file_stream->file);
-        if (file_stream->size == 0) {
+    *byte = self->chunk[self->byteIndex++];
+    if (self->byteIndex == self->chunkSize) {
+        self->byteIndex = 0;
+        ++self->chunkIndex;
+        self->chunkSize = fread(self->chunk, 1, ZLANG_CHUNK_SIZE, self->file);
+        if (self->chunkSize == 0) {
             return false;
         }
     }
@@ -107,21 +110,21 @@ ZBool ZFileNextByte(ZFileStream *file_stream, ZByte *byte) {
 }
 
 /** Outputs an array of bytes from a file stream, iterating chunks when needed. */
-ZBool ZFileNextArray(ZFileStream *file_stream, ZSize size, ZByte *array) {
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
-    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
+ZBool ZFileStream_nextArray(ZFileStream *self, ZUInt size, ZByte *array) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    ZAssert(self->file != NULL, "<self>'s FILE handle was NULL!");
     ZAssert(array != NULL, "<array> was NULL!");
     ZInt endian = 1;
     if (*(ZByte *) &endian == 1) {
         for (; size > 0; --size) {
-            if (!ZFileNextByte(file_stream, array++)) {
+            if (!ZFileStream_nextByte(self, array++)) {
                 return false;
             }
         }
     } else {
         array += size;
         for (; size > 0; --size) {
-            if (!ZFileNextByte(file_stream, --array)) {
+            if (!ZFileStream_nextByte(self, --array)) {
                 return false;
             }
         }
@@ -129,38 +132,30 @@ ZBool ZFileNextArray(ZFileStream *file_stream, ZSize size, ZByte *array) {
     return true;
 }
 
-/** Outputs an 8-byte word from a file stream, iterating chunks when needed. */
-ZBool ZFileNextWord(ZFileStream *file_stream, ZULong *word) {
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
-    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
-    ZAssert(word != NULL, "<word> was NULL!");
-    return ZFileNextArray(file_stream, sizeof(ZULong), (ZByte *) word);
-}
-
 /** Jumps to the given byte index in a file stream. */
-ZBool ZFileJump(ZFileStream *file_stream, ZIndex index) {
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
-    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
+ZBool ZFileStream_jump(ZFileStream *self, ZULong index) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    ZAssert(self->file != NULL, "<self>'s FILE handle was NULL!");
     ZUInt chunk = (index / ZLANG_CHUNK_SIZE) * ZLANG_CHUNK_SIZE;
-    if (file_stream->chunk_index != chunk) {
-        file_stream->chunk_index = chunk;
-        fseek(file_stream->file, chunk, SEEK_SET);
-        file_stream->size = fread(file_stream->chunk, 1, ZLANG_CHUNK_SIZE, file_stream->file);
+    if (self->chunkIndex != chunk) {
+        self->chunkIndex = chunk;
+        fseek(self->file, chunk, SEEK_SET);
+        self->chunkSize = fread(self->chunk, 1, ZLANG_CHUNK_SIZE, self->file);
     }
-    file_stream->index = index % ZLANG_CHUNK_SIZE;
-    return file_stream->index < file_stream->size;
+    self->byteIndex = index % ZLANG_CHUNK_SIZE;
+    return self->byteIndex < self->chunkSize;
 }
 
 /** Returns the current byte index of a file stream. */
-ZIndex ZFileIndex(const ZFileStream *file_stream) {
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
-    return (file_stream->chunk_index * ZLANG_CHUNK_SIZE) + file_stream->index;
+ZULong ZFileStream_index(const ZFileStream *self) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    return (self->chunkIndex * ZLANG_CHUNK_SIZE) + self->byteIndex;
 }
 
 /** Closes a file stream. */
-void ZFileClose(ZFileStream *file_stream) {
-    ZAssert(file_stream != NULL, "<file_stream> was NULL!");
-    ZAssert(file_stream->file != NULL, "<file_stream>'s FILE handle was NULL!");
-    fclose(file_stream->file);
-    file_stream->file = NULL;
+void ZFileStream_delete(ZFileStream *self) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    ZAssert(self->file != NULL, "<self>'s FILE handle was NULL!");
+    fclose(self->file);
+    self->file = NULL;
 }

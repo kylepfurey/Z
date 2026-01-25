@@ -1,51 +1,51 @@
 // .c
-// Z Stack Operation Functions
+// Z Stack Class
 // by Kyle Furey
 
 #include <ZLang.h>
 
-/** Initializes a new stack. */
-ZBool ZStackInit(ZSize pushed, ZStack *stack) {
-    ZAssert(stack != NULL, "<stack> was NULL!");
-    stack->top = stack->bottom;
-    return ZStackPush(stack, pushed);
+/** Initializes a new stack. This does not need to be deleted. */
+ZBool ZStack_new(ZStack *self, ZUInt pushed) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    self->top = self->bottom;
+    return ZStack_push(self, pushed);
 }
 
 /** Pushes bytes to the stack. */
-ZBool ZStackPush(ZStack *stack, ZSize size) {
-    ZAssert(stack != NULL, "<stack> was NULL!");
-    if (stack->top + size > stack->bottom + ZLANG_STACK_SIZE) {
+ZBool ZStack_push(ZStack *self, ZUInt size) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    if (self->top + size > self->bottom + ZLANG_STACK_SIZE) {
         ZError("Stack overflow!");
         return false;
     }
-    memset(stack->top, 0, size);
-    stack->top += size;
+    memset(self->top, 0, size);
+    self->top += size;
     return true;
 }
 
 /** Pops bytes from the stack. */
-ZBool ZStackPop(ZStack *stack, ZSize size) {
-    ZAssert(stack != NULL, "<stack> was NULL!");
-    if (stack->top - size < stack->bottom) {
+ZBool ZStack_pop(ZStack *self, ZUInt size) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    if (self->top - size < self->bottom) {
         ZError("Stack underflow!");
         return false;
     }
-    stack->top -= size;
+    self->top -= size;
     return true;
 }
 
 /** Returns a pointer to the stack data at the given offset. */
-void *ZStackPeek(ZStack *stack, ZIndex offset) {
-    ZAssert(stack != NULL, "<stack> was NULL!");
-    if (offset > (stack->top - stack->bottom)) {
+void *ZStack_peek(ZStack *self, ZUInt offset) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    if (offset > (self->top - self->bottom)) {
         ZError("Invalid stack offset!");
         return NULL;
     }
-    return stack->top - offset;
+    return self->top - offset;
 }
 
 /** Returns the current size of the stack. */
-ZLANG_API ZSize ZStackSize(const ZStack *stack) {
-    ZAssert(stack != NULL, "<stack> was NULL!");
-    return (ZSize) (stack->top - stack->bottom);
+ZUInt ZStack_size(const ZStack *self) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    return (ZUInt) (self->top - self->bottom);
 }

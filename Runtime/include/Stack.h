@@ -1,5 +1,5 @@
 // .h
-// Z Stack Operation Functions
+// Z Stack Class
 // by Kyle Furey
 
 #ifndef ZLANG_STACK_H
@@ -16,27 +16,27 @@ extern "C" {
 
 /** A single thread's stack memory. */
 typedef struct {
-    /** A pointer to the base of the stack. */
+    /** A pointer to the base of this stack. */
     ZByte bottom[ZLANG_STACK_SIZE];
 
-    /** A pointer to the top of the stack. */
+    /** A pointer to the top of this stack. */
     ZByte *top;
 } ZStack;
 
-/** Initializes a new stack. */
-ZLANG_API ZBool ZStackInit(ZSize pushed, ZStack *stack);
+/** Initializes a new stack. This does not need to be deleted. */
+ZLANG_API ZBool ZStack_new(ZStack *self, ZUInt pushed);
 
 /** Pushes bytes to the stack. */
-ZLANG_API ZBool ZStackPush(ZStack *stack, ZSize size);
+ZLANG_API ZBool ZStack_push(ZStack *self, ZUInt size);
 
 /** Pops bytes from the stack. */
-ZLANG_API ZBool ZStackPop(ZStack *stack, ZSize size);
+ZLANG_API ZBool ZStack_pop(ZStack *self, ZUInt size);
 
 /** Returns a pointer to the stack data at the given offset. */
-ZLANG_API void *ZStackPeek(ZStack *stack, ZIndex offset);
+ZLANG_API void *ZStack_peek(ZStack *self, ZUInt offset);
 
 /** Returns the current size of the stack. */
-ZLANG_API ZSize ZStackSize(const ZStack *stack);
+ZLANG_API ZUInt ZStack_size(const ZStack *self);
 
 #ifdef __cplusplus
 }

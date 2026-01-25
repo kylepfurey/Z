@@ -1,5 +1,5 @@
 // .c
-// Z Coroutine Structure and Functions
+// Z Coroutine Class
 // by Kyle Furey
 
 #include <ZLang.h>

@@ -14,14 +14,14 @@ extern "C" {
 /** Contains the arguments of the program. */
 typedef struct {
     /** The number of arguments passed to the program. */
-    ZUInt argc;
+    ZUInt count;
 
     /** The arguments passed to the program as an array of strings. */
-    ZString *argv;
+    ZString *array;
 } ZArgs;
 
 /** Executes a .zac file at the given path, returning 0 or an error code from the program. */
-ZLANG_API ZInt ZExecute(ZString path, ZArgs args);
+ZLANG_API ZInt Zexecute(ZString path, ZArgs args);
 
 #ifdef __cplusplus
 }

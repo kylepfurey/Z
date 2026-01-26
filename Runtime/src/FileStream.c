@@ -5,43 +5,9 @@
 #include <ZLang.h>
 
 /** Loads a .zac or .zlib program at the given path into a file stream. */
-ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong offset) {
+ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
     ZAssert(path != NULL, "<path> was NULL!");
     ZAssert(self != NULL, "<self> was NULL!");
-    ZLong length = (ZLong) strlen(path);
-    if (length <= 0) {
-        ZError("Invalid path!");
-        return false;
-    }
-    for (--length; length >= 0; --length) {
-        if (path[length] == '.') {
-            ZString extension = path + length + 1;
-            if (tolower(extension[0]) == 'z') {
-                switch (tolower(extension[1])) {
-                    case 'a':
-                        if (tolower(extension[2]) == 'c') {
-                            goto success;
-                        }
-                        break;
-                    case 'l':
-                        if (tolower(extension[2]) == 'i' &&
-                            tolower(extension[3]) == 'b') {
-                            goto success;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                ZError("Invalid file extension!");
-                return false;
-            }
-        }
-        if (length == 0) {
-            ZError("Cannot execute a directory!");
-            return false;
-        }
-    }
-success:
     FILE *file = fopen(path, "rb");
     if (file == NULL) {
         ZError("File not found!");
@@ -72,13 +38,13 @@ success:
     fseek(file, ZLANG_CHUNK_SIZE, SEEK_SET);
     self->byteIndex = 1;
     self->chunkIndex = 0;
-    self->globalOffset = offset;
+    self->globalOffset = globalOffset;
     self->file = file;
     return true;
 }
 
 /** Outputs the current byte of a file stream. */
-ZBool ZFileStream_current(ZFileStream *self, ZByte *byte) {
+ZBool ZFileStream_currentByte(ZFileStream *self, ZByte *byte) {
     ZAssert(self != NULL, "<self> was NULL!");
     ZAssert(self->file != NULL, "<self>'s FILE handle was NULL!");
     ZAssert(byte != NULL, "<byte> was NULL!");
@@ -133,23 +99,35 @@ ZBool ZFileStream_nextArray(ZFileStream *self, ZUInt size, ZByte *array) {
 }
 
 /** Jumps to the given byte index in a file stream. */
-ZBool ZFileStream_jump(ZFileStream *self, ZULong index) {
+ZBool ZFileStream_jumpLocal(ZFileStream *self, ZULong localOffset) {
     ZAssert(self != NULL, "<self> was NULL!");
     ZAssert(self->file != NULL, "<self>'s FILE handle was NULL!");
-    ZUInt chunk = (index / ZLANG_CHUNK_SIZE) * ZLANG_CHUNK_SIZE;
+    ZUInt chunk = (localOffset / ZLANG_CHUNK_SIZE) * ZLANG_CHUNK_SIZE;
     if (self->chunkIndex != chunk) {
         self->chunkIndex = chunk;
         fseek(self->file, chunk, SEEK_SET);
         self->chunkSize = fread(self->chunk, 1, ZLANG_CHUNK_SIZE, self->file);
     }
-    self->byteIndex = index % ZLANG_CHUNK_SIZE;
+    self->byteIndex = localOffset % ZLANG_CHUNK_SIZE;
     return self->byteIndex < self->chunkSize;
 }
 
 /** Returns the current byte index of a file stream. */
-ZULong ZFileStream_index(const ZFileStream *self) {
+ZULong ZFileStream_localOffset(const ZFileStream *self) {
     ZAssert(self != NULL, "<self> was NULL!");
     return (self->chunkIndex * ZLANG_CHUNK_SIZE) + self->byteIndex;
+}
+
+/** Returns the current global offset of a file stream. */
+ZULong ZFileStream_globalOffset(const ZFileStream *self) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    return ZFileStream_localOffset(self) + self->globalOffset;
+}
+
+/** Returns whether a global offset is in range of a file stream. */
+ZBool ZFileStream_inRange(const ZFileStream *self, ZULong globalOffset) {
+    ZAssert(self != NULL, "<self> was NULL!");
+    return globalOffset >= self->globalOffset && globalOffset < self->globalOffset + self->fileSize;
 }
 
 /** Closes a file stream. */

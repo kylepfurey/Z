@@ -38,10 +38,10 @@ typedef struct {
 } ZFileStream;
 
 /** Loads a .zac or .zlib program at the given path into a file stream. */
-ZLANG_API ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong offset);
+ZLANG_API ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset);
 
 /** Outputs the current byte of a file stream. */
-ZLANG_API ZBool ZFileStream_current(ZFileStream *self, ZByte *byte);
+ZLANG_API ZBool ZFileStream_currentByte(ZFileStream *self, ZByte *byte);
 
 /** Outputs the next byte of a file stream, iterating chunks when needed. */
 ZLANG_API ZBool ZFileStream_nextByte(ZFileStream *self, ZByte *byte);
@@ -49,11 +49,17 @@ ZLANG_API ZBool ZFileStream_nextByte(ZFileStream *self, ZByte *byte);
 /** Outputs an array of bytes from a file stream, iterating chunks when needed. */
 ZLANG_API ZBool ZFileStream_nextArray(ZFileStream *self, ZUInt size, ZByte *array);
 
-/** Jumps to the given byte index in a file stream. */
-ZLANG_API ZBool ZFileStream_jump(ZFileStream *self, ZULong index);
+/** Jumps to the given local offset in a file stream. */
+ZLANG_API ZBool ZFileStream_jumpLocal(ZFileStream *self, ZULong localOffset);
 
-/** Returns the current byte index of a file stream. */
-ZLANG_API ZULong ZFileStream_index(const ZFileStream *self);
+/** Returns the current local offset of a file stream. */
+ZLANG_API ZULong ZFileStream_localOffset(const ZFileStream *self);
+
+/** Returns the current global offset of a file stream. */
+ZLANG_API ZULong ZFileStream_globalOffset(const ZFileStream *self);
+
+/** Returns whether a global offset is in range of a file stream. */
+ZLANG_API ZBool ZFileStream_inRange(const ZFileStream *self, ZULong globalOffset);
 
 /** Closes a file stream. */
 ZLANG_API void ZFileStream_delete(ZFileStream *self);

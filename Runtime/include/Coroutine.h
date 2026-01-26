@@ -19,8 +19,8 @@ typedef struct {
     /** This coroutine's stack space. */
     ZStack stack;
 
-    /** This coroutine's current global file address. */
-    ZULong fileAddress;
+    /** This coroutine's current global offset. */
+    ZULong globalOffset;
 
     /** The delay in milliseconds before resuming this coroutine. */
     ZUInt delayMs;

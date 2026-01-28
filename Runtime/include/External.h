@@ -13,9 +13,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
 #include <time.h>
-#include <assert.h>
 
 // EXTERNAL LIBRARIES
 #include <ffi.h>

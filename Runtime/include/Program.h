@@ -8,10 +8,6 @@
 #include <Coroutine.h>
 #include <FileStream.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** All data related to the runtime of a single Z program. */
 typedef struct {
     struct {
@@ -63,9 +59,5 @@ ZLANG_API ZBool ZProgram_run(ZProgram *self);
 
 /** Cleans up all memory owned by a Z program. */
 ZLANG_API void ZProgram_delete(ZProgram *self);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // ZLANG_PROGRAM_H

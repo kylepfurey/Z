@@ -8,10 +8,6 @@
 #include <External.h>
 #include <Export.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** A true or false boolean value. */
 typedef bool ZBool;
 
@@ -50,9 +46,5 @@ typedef char ZChar;
 
 /** A null-terminated sequence of characters representing text. */
 typedef const ZChar *ZString;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // ZLANG_TYPES_H

@@ -7,10 +7,6 @@
 
 #include <Types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** Each enumerated operation code. */
 enum {
     ZOPCODE_MAGIC = 'Z',
@@ -23,18 +19,19 @@ enum {
     ZOPCODE_set = 'S',
     ZOPCODE_get = '{',
     ZOPCODE_put = '}',
-    ZOPCODE_ptr = '$',
+    ZOPCODE_ptr = '@',
     ZOPCODE_jmp = 'J',
     ZOPCODE_hop = 'j',
     ZOPCODE_call = 'C',
     ZOPCODE_ret = 'R',
-    ZOPCODE_addr = '@',
+    ZOPCODE_addr = '$',
     ZOPCODE_eql = '=',
-    ZOPCODE_grtr = '\\',
+    ZOPCODE_grtr = 'G',
     ZOPCODE_flip = '!',
     ZOPCODE_if = '?',
     ZOPCODE_coro = '\t',
     ZOPCODE_yld = '\n',
+    ZOPCODE_wait = '\r',
     ZOPCODE_cncl = '\b',
     ZOPCODE_kill = '\0',
     ZOPCODE_inc = 'i',
@@ -50,7 +47,6 @@ enum {
     ZOPCODE_xor = '^',
     ZOPCODE_lshf = '<',
     ZOPCODE_rshf = '>',
-    ZOPCODE_std = 'c',
     ZOPCODE_ffi = 'f',
     ZOPCODE_TOTAL = 38,
 };
@@ -95,9 +91,5 @@ typedef struct {
 } __attribute__((packed)) ZOpcode;
 
 #pragma pack(pop)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // ZLANG_OPCODE_H

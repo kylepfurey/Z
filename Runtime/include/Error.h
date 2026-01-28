@@ -15,7 +15,7 @@
 
 #ifdef ZLANG_DEBUG
 /** Logs a message to the Z runtime when debugging. */
-#define ZLog(...)\
+#define Zlog(...)\
 do { fprintf(stdout, "Z LOG:\t\t"); fprintf(stdout, __VA_ARGS__); fprintf(stdout, "\n"); } while (false)
 #else
 /** Noop. */
@@ -24,7 +24,7 @@ do { fprintf(stdout, "Z LOG:\t\t"); fprintf(stdout, __VA_ARGS__); fprintf(stdout
 
 #ifdef ZLANG_DEBUG
 /** Logs an error to the Z runtime when debugging. */
-#define ZError(...)\
+#define Zerror(...)\
 do { fprintf(stderr, "Z ERROR:\t"); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } while (false)
 #else
 /** Noop. */
@@ -33,7 +33,7 @@ do { fprintf(stderr, "Z ERROR:\t"); fprintf(stderr, __VA_ARGS__); fprintf(stderr
 
 #ifdef ZLANG_DEBUG
 /** Crashes the Z runtime with the given message <msg> if <cond> is false. */
-#define ZAssert(cond, msg)\
+#define Zassert(cond, msg)\
 if (!(cond))\
 fprintf(\
     stderr,\
@@ -45,7 +45,7 @@ fprintf(\
 exit(ZLANG_ERROR)
 #else
 /** Noop. */
-#define ZAssert(cond, msg) do {} while(false)
+#define Zassert(cond, msg) do {} while(false)
 #endif
 
 #endif // ZLANG_ERROR_H

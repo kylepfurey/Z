@@ -7,10 +7,6 @@
 
 #include <Types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** The size of a thread's stack. */
 #define ZLANG_STACK_SIZE 4000000
 
@@ -37,9 +33,5 @@ ZLANG_API void *ZStack_peek(ZStack *self, ZUInt offset);
 
 /** Returns the current size of the stack. */
 ZLANG_API ZUInt ZStack_size(const ZStack *self);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // ZLANG_STACK_H

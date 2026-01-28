@@ -16,7 +16,6 @@
 #include <Coroutine.h>
 #include <Stack.h>
 #include <Opcode.h>
-#include <STD.h>
 #include <FFI.h>
 
 #endif // ZLANG_H

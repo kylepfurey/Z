@@ -7,12 +7,11 @@
 
 #include <Stack.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /** The number of milliseconds a coroutine is alloted before context-switching. */
 #define ZLANG_COROUTINE_DELAY_MS 100
+
+/** A unique number representing an empty coroutine handle. */
+#define ZLANG_COROUTINE_NULL ((ZUInt) -1)
 
 /** A single coroutine containing a stack and file address. */
 typedef struct {
@@ -24,10 +23,9 @@ typedef struct {
 
     /** The delay in milliseconds before resuming this coroutine. */
     ZUInt delayMs;
-} ZCoroutine;
 
-#ifdef __cplusplus
-}
-#endif
+    /** The coroutine handle this coroutine is waiting on. */
+    ZUInt waitingOn;
+} ZCoroutine;
 
 #endif // ZLANG_COROUTINE_H

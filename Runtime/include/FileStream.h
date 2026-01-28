@@ -6,12 +6,12 @@
 #define ZLANG_FILESTREAM_H
 
 #include <Types.h>
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /** The size of a single file chunk loaded into memory. */
 #define ZLANG_CHUNK_SIZE 1024
+
+/** Evaluates whether the runtime is using little-endian binary. */
+#define ZLANG_LITTLE_ENDIAN (*(ZByte *) &(ZByte){1} == 1)
 
 /** A handle to a file used to iterate its memory in chunks. */
 typedef struct {
@@ -63,9 +63,5 @@ ZLANG_API ZBool ZFileStream_inRange(const ZFileStream *self, ZULong globalOffset
 
 /** Closes a file stream. */
 ZLANG_API void ZFileStream_delete(ZFileStream *self);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // ZLANG_FILESTREAM_H

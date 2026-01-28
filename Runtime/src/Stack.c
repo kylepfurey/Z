@@ -18,7 +18,6 @@ ZBool ZStack_push(ZStack *self, ZUInt size) {
         ZError("Stack overflow!");
         return false;
     }
-    memset(self->top, 0, size);
     self->top += size;
     return true;
 }

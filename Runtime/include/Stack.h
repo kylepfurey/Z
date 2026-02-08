@@ -10,7 +10,7 @@
 /** The size of a thread's stack. */
 #define ZLANG_STACK_SIZE 4000000
 
-/** A single thread's stack memory. */
+/** A single coroutine's stack memory. */
 typedef struct {
     /** A pointer to the base of this stack. */
     ZByte bottom[ZLANG_STACK_SIZE];

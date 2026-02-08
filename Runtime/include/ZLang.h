@@ -12,8 +12,9 @@
 #include <Error.h>
 #include <Execute.h>
 #include <Program.h>
-#include <FileStream.h>
+#include <Vector.h>
 #include <Coroutine.h>
+#include <FileStream.h>
 #include <Stack.h>
 #include <Opcode.h>
 #include <FFI.h>

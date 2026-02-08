@@ -18,6 +18,9 @@ typedef struct {
     /** The file chunk buffer. */
     ZByte chunk[ZLANG_CHUNK_SIZE];
 
+    /** The cached global offset of this file in virtual memory. */
+    ZULong globalOffset;
+
     /** The index of the current file chunk. */
     ZUInt chunkIndex;
 
@@ -26,9 +29,6 @@ typedef struct {
 
     /** The index of the current byte in the current file chunk. */
     ZUShort byteIndex;
-
-    /** The global offset of this file in virtual memory. */
-    ZULong globalOffset;
 
     /** The size of this file's binary. */
     ZULong fileSize;

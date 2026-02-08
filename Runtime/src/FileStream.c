@@ -33,12 +33,12 @@ ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
         Zerror("File does not end with the Z byte!");
         return false;
     }
+    self->globalOffset = globalOffset;
+    self->chunkIndex = 0;
+    self->byteIndex = 1;
     fseek(file, 0, SEEK_END);
     self->fileSize = ftell(file);
     fseek(file, ZLANG_CHUNK_SIZE, SEEK_SET);
-    self->byteIndex = 1;
-    self->chunkIndex = 0;
-    self->globalOffset = globalOffset;
     self->file = file;
     return true;
 }

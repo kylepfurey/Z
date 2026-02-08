@@ -29,7 +29,7 @@ ZInt Zexecute(ZString path, ZArgs args) {
         }
     }
     ZCoroutine mainCoroutine;
-    if (!ZCoroutine_new(&mainCoroutine, sizeof(ZInt) + sizeof(ZArgs), 1)) {
+    if (!ZCoroutine_new(&mainCoroutine)) {
         Zerror("Could not start main coroutine!");
         return ZLANG_ERROR;
     }

@@ -26,6 +26,7 @@ add_library(ZRuntimeLib SHARED
         ${CMAKE_SOURCE_DIR}/include/Error.h
         ${CMAKE_SOURCE_DIR}/include/Execute.h
         ${CMAKE_SOURCE_DIR}/include/Program.h
+        ${CMAKE_SOURCE_DIR}/include/Vector.h
         ${CMAKE_SOURCE_DIR}/include/Coroutine.h
         ${CMAKE_SOURCE_DIR}/include/FileStream.h
         ${CMAKE_SOURCE_DIR}/include/Stack.h
@@ -33,6 +34,7 @@ add_library(ZRuntimeLib SHARED
         ${CMAKE_SOURCE_DIR}/include/FFI.h
         ${CMAKE_SOURCE_DIR}/src/Execute.c
         ${CMAKE_SOURCE_DIR}/src/Program.c
+        ${CMAKE_SOURCE_DIR}/src/Vector.c
         ${CMAKE_SOURCE_DIR}/src/Coroutine.c
         ${CMAKE_SOURCE_DIR}/src/FileStream.c
         ${CMAKE_SOURCE_DIR}/src/Stack.c
@@ -76,6 +78,7 @@ add_executable(ZRuntimeExe
         ${CMAKE_SOURCE_DIR}/include/Error.h
         ${CMAKE_SOURCE_DIR}/include/Execute.h
         ${CMAKE_SOURCE_DIR}/include/Program.h
+        ${CMAKE_SOURCE_DIR}/include/Vector.h
         ${CMAKE_SOURCE_DIR}/include/Coroutine.h
         ${CMAKE_SOURCE_DIR}/include/FileStream.h
         ${CMAKE_SOURCE_DIR}/include/Stack.h
@@ -83,6 +86,7 @@ add_executable(ZRuntimeExe
         ${CMAKE_SOURCE_DIR}/include/FFI.h
         ${CMAKE_SOURCE_DIR}/src/Execute.c
         ${CMAKE_SOURCE_DIR}/src/Program.c
+        ${CMAKE_SOURCE_DIR}/src/Vector.c
         ${CMAKE_SOURCE_DIR}/src/Coroutine.c
         ${CMAKE_SOURCE_DIR}/src/FileStream.c
         ${CMAKE_SOURCE_DIR}/src/Stack.c

@@ -15,7 +15,7 @@ enum {
     ZOPCODE_load = 'L',
     ZOPCODE_push = 'P',
     ZOPCODE_pop = 'p',
-    ZOPCODE_mov = 'M',
+    ZOPCODE_move = 'M',
     ZOPCODE_set = 'S',
     ZOPCODE_get = '{',
     ZOPCODE_put = '}',
@@ -48,8 +48,9 @@ enum {
     ZOPCODE_xor = '^',
     ZOPCODE_lshf = '<',
     ZOPCODE_rshf = '>',
+    ZOPCODE_hash = '#',
     ZOPCODE_ffi = 'f',
-    ZOPCODE_TOTAL = 39,
+    ZOPCODE_TOTAL = 40,
 };
 
 /** Each bitflag value for an operation. */
@@ -74,21 +75,21 @@ typedef struct {
     /** Bitflags for this instruction. */
     ZByte flags;
 
+    /** A stack-top offset used for writing. */
+    ZUInt write;
+
     union {
         struct {
-            /** A stack offset used for writing. */
-            ZUInt write;
-
-            /** A stack offset used for reading. */
+            /** A stack-top offset used for reading. */
             ZUInt read;
+
+            /** A stack-top offset used for arguments. */
+            ZUInt arg;
         };
 
-        /** A large argument value for this instruction. */
+        /** A literal size argument for this instruction. */
         ZULong size;
     };
-
-    /** A small argument value for this instruction. */
-    ZUShort arg;
 } __attribute__((packed)) ZOpcode;
 
 #pragma pack(pop)

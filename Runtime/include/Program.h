@@ -24,11 +24,11 @@ typedef struct {
     /** A vector of pointers to file streams in global order. */
     ZVector files;
 
-    /** A vector of pointers to cached FFI data. */
-    ZVector ffi;
+    /** A vector of pointers to dynamic libraries. */
+    ZVector libraries;
 } ZProgram;
 
-/** Initializes a new Z program using a stack-allocated coroutine and file stream. */
+/** Initializes a new Z program. */
 ZLANG_API ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[]);
 
 /** Starts a new coroutine in a Z program. */
@@ -42,8 +42,11 @@ ZLANG_API ZBool ZProgram_startCoroutine(
 /** Stops a coroutine by its index in a Z program. Only "fails" on stopping main. */
 ZLANG_API ZBool ZProgram_stopCoroutine(ZProgram *self, ZUInt index, ZBool dispatch);
 
-/** Loads a library into the Z program file streams. */
-ZLANG_API ZBool ZProgram_loadLibrary(ZProgram *self, ZString path);
+/** Loads a .zlib library into the Z program. */
+ZLANG_API ZBool ZProgram_loadZLibrary(ZProgram *self, ZString path);
+
+/** Loads a dynamic library into the Z program. */
+ZLANG_API ZBool ZProgram_loadCLibrary(ZProgram *self, ZString name);
 
 /** Executes the next coroutine in a Z program. Returns whether the program can continue. */
 ZLANG_API ZBool ZProgram_step(ZProgram *self);

@@ -17,9 +17,9 @@ ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
         }
         ZULong homeLen = strlen(home);
         ZULong pathLen = strlen(path);
-        ZChar *buffer = malloc(homeLen + pathLen + 2);
+        ZChar *buffer = (ZChar *) malloc(homeLen + pathLen + 2);
         if (buffer == NULL) {
-            Zerror("Could not parse Z_HOME path!");
+            Zerror("Could not allocate buffer for Z_HOME path + file path!");
             return false;
         }
         memcpy(buffer, home, homeLen);
@@ -27,12 +27,11 @@ ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
         memcpy(buffer + homeLen + 1, path, pathLen);
         buffer[homeLen + pathLen + 1] = '\0';
         file = fopen(buffer, "rb");
+        free(buffer);
         if (file == NULL) {
             Zerror("File not found in directory or Z_HOME!");
-            free(buffer);
             return false;
         }
-        free(buffer);
     }
     self->chunkSize = fread(self->chunk, 1, ZLANG_CHUNK_SIZE, file);
     if (self->chunkSize == 0 || self->chunk[0] != ZOPCODE_MAGIC) {

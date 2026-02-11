@@ -17,6 +17,6 @@
 #include <FileStream.h>
 #include <Stack.h>
 #include <Opcode.h>
-#include <FFI.h>
+#include <Library.h>
 
 #endif // ZLANG_H

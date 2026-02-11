@@ -16,19 +16,27 @@
 #ifdef ZLANG_DEBUG
 /** Logs a message to the Z runtime when debugging. */
 #define Zlog(...)\
-do { fprintf(stdout, "Z LOG:\t\t"); fprintf(stdout, __VA_ARGS__); fprintf(stdout, "\n"); } while (false)
+do {\
+    fprintf(stdout, "Z LOG:\t\t");\
+    fprintf(stdout, __VA_ARGS__);\
+    fprintf(stdout, "\n");\
+} while (false)
 #else
 /** Noop. */
-#define ZLog(...) do {} while(false)
+#define Zlog(...) do {} while(false)
 #endif
 
 #ifdef ZLANG_DEBUG
 /** Logs an error to the Z runtime when debugging. */
 #define Zerror(...)\
-do { fprintf(stderr, "Z ERROR:\t"); fprintf(stderr, __VA_ARGS__); fprintf(stderr, "\n"); } while (false)
+do {\
+    fprintf(stderr, "Z ERROR:\t");\
+    fprintf(stderr, __VA_ARGS__);\
+    fprintf(stderr, "\n");\
+} while (false)
 #else
 /** Noop. */
-#define ZError(...) do {} while(false)
+#define Zerror(...) do {} while(false)
 #endif
 
 #ifdef ZLANG_DEBUG

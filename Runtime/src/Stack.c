@@ -33,14 +33,26 @@ ZBool ZStack_pop(ZStack *self, ZUInt size) {
     return true;
 }
 
-/** Returns a pointer to the stack data at the given offset. */
-void *ZStack_peek(ZStack *self, ZUInt offset) {
+/** Returns a pointer to the stack data at the given top offset. */
+void *ZStack_peekTop(ZStack *self, ZUInt offset, ZUInt size) {
     Zassert(self != NULL, "<self> was NULL!");
-    if (offset > (self->top - self->bottom)) {
-        Zerror("Invalid stack offset!");
+    ZUInt max = (ZUInt) (self->top - self->bottom);
+    if (offset > max || size > offset) {
+        Zerror("Invalid stack range!");
         return NULL;
     }
     return self->top - offset;
+}
+
+/** Returns a pointer to the stack data at the given bottom offset. */
+void *ZStack_peekBottom(ZStack *self, ZUInt offset, ZUInt size) {
+    Zassert(self != NULL, "<self> was NULL!");
+    ZUInt max = (ZUInt) (self->top - self->bottom);
+    if (offset > max || size > max - offset) {
+        Zerror("Invalid stack range!");
+        return NULL;
+    }
+    return self->bottom + offset;
 }
 
 /** Returns the current size of the stack. */

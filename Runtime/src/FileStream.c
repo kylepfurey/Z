@@ -4,7 +4,7 @@
 
 #include <ZLang.h>
 
-/** Loads a .zac or .zlib program at the given path into a file stream. */
+/** Initializes a new file stream. */
 ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
     Zassert(path != NULL, "<path> was NULL!");
     Zassert(self != NULL, "<self> was NULL!");
@@ -129,7 +129,7 @@ ZBool ZFileStream_inRange(const ZFileStream *self, ZULong globalOffset) {
     return globalOffset >= self->globalOffset && globalOffset < self->globalOffset + self->fileSize;
 }
 
-/** Closes a file stream. */
+/** Cleans up all memory owned by a file stream. */
 void ZFileStream_delete(ZFileStream *self) {
     Zassert(self != NULL, "<self> was NULL!");
     Zassert(self->file != NULL, "<self>'s FILE handle was NULL!");

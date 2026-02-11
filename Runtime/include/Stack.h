@@ -28,8 +28,11 @@ ZLANG_API ZBool ZStack_push(ZStack *self, ZUInt size);
 /** Pops bytes from the stack. */
 ZLANG_API ZBool ZStack_pop(ZStack *self, ZUInt size);
 
-/** Returns a pointer to the stack data at the given offset. */
-ZLANG_API void *ZStack_peek(ZStack *self, ZUInt offset);
+/** Returns a pointer to the stack data at the given top offset. */
+ZLANG_API void *ZStack_peekTop(ZStack *self, ZUInt offset, ZUInt size);
+
+/** Returns a pointer to the stack data at the given bottom offset. */
+ZLANG_API void *ZStack_peekBottom(ZStack *self, ZUInt offset, ZUInt size);
 
 /** Returns the current size of the stack. */
 ZLANG_API ZUInt ZStack_size(const ZStack *self);

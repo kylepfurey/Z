@@ -7,16 +7,7 @@
 
 #include <Types.h>
 
-/** Contains the arguments of the program. */
-typedef struct {
-    /** The number of arguments passed to the program. */
-    ZUInt count;
-
-    /** The arguments passed to the program as an array of strings. */
-    ZString *array;
-} ZArgs;
-
 /** Executes a .zac file at the given path, returning 0 or an error code from the program. */
-ZLANG_API ZInt Zexecute(ZString path, ZArgs args);
+ZLANG_API ZInt Zexecute(ZString path, ZUInt argc, const ZString argv[]);
 
 #endif // ZLANG_EXECUTE_H

@@ -6,9 +6,15 @@
 
 /** Executes a Z program with arguments. */
 int main(int argc, char *argv[]) {
-    if (argc == 0) {
+    Zassert(argv != NULL, "<argv> was NULL!");
+    Zassert(argv[argc] == NULL, "<argv> was not null-terminated!");
+    if (argc <= 0) {
         Zerror("No file was given!");
         return ZLANG_ERROR;
     }
-    return Zexecute(argv[argc - 1], (ZArgs){argc - 1, (ZString *) argv + 1});
+    return Zexecute(
+        (ZString) (argv[argc - 1]),
+        (ZUInt) (argc - 1),
+        (const ZString *) (argv + 1)
+    );
 }

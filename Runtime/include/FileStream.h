@@ -37,7 +37,7 @@ typedef struct {
     FILE *file;
 } ZFileStream;
 
-/** Loads a .zac or .zlib program at the given path into a file stream. */
+/** Initializes a new file stream. */
 ZLANG_API ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset);
 
 /** Outputs the current byte of a file stream. */
@@ -61,7 +61,7 @@ ZLANG_API ZULong ZFileStream_globalOffset(const ZFileStream *self);
 /** Returns whether a global offset is in range of a file stream. */
 ZLANG_API ZBool ZFileStream_inRange(const ZFileStream *self, ZULong globalOffset);
 
-/** Closes a file stream. */
+/** Cleans up all memory owned by a file stream. */
 ZLANG_API void ZFileStream_delete(ZFileStream *self);
 
 #endif // ZLANG_FILESTREAM_H

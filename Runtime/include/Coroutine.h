@@ -11,8 +11,8 @@
 /** The number of milliseconds a coroutine is alloted before context-switching. */
 #define ZLANG_COROUTINE_DELAY_MS 100
 
-/** An index representing an empty coroutine handle. */
-#define ZLANG_COROUTINE_NULL ((ZUInt) -1)
+/** The index of the main coroutine. */
+#define ZLANG_COROUTINE_MAIN 0
 
 /** Stack memory and metadata for a single coroutine. */
 typedef struct {
@@ -25,7 +25,7 @@ typedef struct {
     /** This coroutine's index. */
     ZUInt index;
 
-    /** The index of a remote coroutine this coroutine is waiting on. */
+    /** The index of a remote coroutine this coroutine is waiting on. 0 is NULL. */
     ZUInt await;
 
     /** The delay in milliseconds before resuming this coroutine. */
@@ -34,6 +34,24 @@ typedef struct {
     /** A vector of handle pointers used to share this coroutine's return value. */
     ZVector dispatcher;
 } ZCoroutine;
+
+#pragma pack(push, 1)
+
+/** A handle used to receive the return value of a remote coroutine. */
+typedef struct {
+    /** Whether this handle contains the remote coroutine's return value. */
+    ZBool valid;
+
+    union {
+        /** If <valid> is false, this is the index of the remote coroutine. */
+        ZUInt index;
+
+        /* If <valid> is true, this is the first 4 bytes of the remote coroutine's return value. */
+        ZByte data;
+    };
+} __attribute__((packed)) ZHandle;
+
+#pragma pack(pop)
 
 /** A pointer to a coroutine handle in a remote coroutine's stack. */
 typedef struct {
@@ -44,26 +62,36 @@ typedef struct {
     ZUInt offset;
 } ZHandlePointer;
 
-#pragma pack(push, 1)
+/** Initializes a main coroutine. */
+ZLANG_API ZBool ZCoroutine_newMain(ZCoroutine *self, ZUInt argc, const ZString argv[]);
 
-/** A handle used to receive the return value of a remote coroutine. */
-typedef struct {
-    /** Whether this handle contains the remote coroutine's return value. */
-    ZBool valid;
+/** Initializes an async coroutine by calling with the given handle. */
+ZLANG_API ZBool ZCoroutine_newAsync(
+    ZCoroutine *self,
+    ZUInt handleStart,
+    ZUInt argSize,
+    ZCoroutine *parent,
+    ZULong globalOffset,
+    ZUInt index
+);
 
-    /**
-     * If <valid> is false, this is the index of the remote coroutine.
-     * If <valid> is true, this is the first 4 bytes of the remote coroutine's return value.
-     */
-    ZUInt index;
-} __attribute__((packed)) ZHandle;
+/** Binds a handle to a coroutine. This cannot fail because binding is anonymous. */
+ZLANG_API void ZCoroutine_bind(
+    ZCoroutine *self,
+    ZUInt coroCount,
+    ZCoroutine *coroutines[],
+    ZUInt coroIndex,
+    ZUInt handleBase
+);
 
-#pragma pack(pop)
+/** Dispatches the return value of a coroutine. This cannot fail because binding is anonymous. */
+ZLANG_API void ZCoroutine_dispatch(
+    const ZCoroutine *self,
+    ZUInt coroCount,
+    ZCoroutine *coroutines[]
+);
 
-/** Initializes a new Z coroutine. */
-ZLANG_API ZBool ZCoroutine_new(ZCoroutine *self);
-
-/** Cleans up all memory owned by a Z coroutine. */
+/** Cleans up all memory owned by a coroutine. */
 ZLANG_API void ZCoroutine_delete(ZCoroutine *self);
 
 #endif // ZLANG_COROUTINE_H

@@ -10,35 +10,63 @@ ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
     Zassert(self != NULL, "<self> was NULL!");
     FILE *file = fopen(path, "rb");
     if (file == NULL) {
-        Zerror("File not found!");
-        return false;
+        ZString home = getenv(ZLANG_HOME);
+        if (home == NULL) {
+            Zerror("File not found in directory!");
+            return false;
+        }
+        ZULong homeLen = strlen(home);
+        ZULong pathLen = strlen(path);
+        ZChar *buffer = malloc(homeLen + pathLen + 2);
+        if (buffer == NULL) {
+            Zerror("Could not parse Z_HOME path!");
+            return false;
+        }
+        memcpy(buffer, home, homeLen);
+        buffer[homeLen] = ZLANG_SEPARATOR;
+        memcpy(buffer + homeLen + 1, path, pathLen);
+        buffer[homeLen + pathLen + 1] = '\0';
+        file = fopen(buffer, "rb");
+        if (file == NULL) {
+            Zerror("File not found in directory or Z_HOME!");
+            free(buffer);
+            return false;
+        }
+        free(buffer);
     }
     self->chunkSize = fread(self->chunk, 1, ZLANG_CHUNK_SIZE, file);
-    if (self->chunk[0] != ZOPCODE_MAGIC) {
-        fclose(file);
+    if (self->chunkSize == 0 || self->chunk[0] != ZOPCODE_MAGIC) {
         Zerror("File does not start with the Z byte!");
+        fclose(file);
         return false;
     }
-    if (self->chunkSize <= 1) {
-        fclose(file);
-        Zerror(
-            self->chunkSize == 0 ?
-            "File does not start with the Z byte!" :
-            "File does not end with the Z byte!"
-        );
-        return false;
-    }
-    if (fseek(file, -1, SEEK_END) != 0 || fgetc(file) != ZOPCODE_MAGIC) {
-        fclose(file);
+    if (self->chunkSize == 1 ||
+        fseek(file, -1, SEEK_END) != 0 ||
+        fgetc(file) != ZOPCODE_MAGIC) {
         Zerror("File does not end with the Z byte!");
+        fclose(file);
         return false;
     }
     self->globalOffset = globalOffset;
     self->chunkIndex = 0;
     self->byteIndex = 1;
-    fseek(file, 0, SEEK_END);
-    self->fileSize = ftell(file);
-    fseek(file, ZLANG_CHUNK_SIZE, SEEK_SET);
+    if (fseek(file, 0, SEEK_END) != 0) {
+        Zerror("Could not set file stream to end!");
+        fclose(file);
+        return false;
+    }
+    ZLong size = ftell(file);
+    if (size <= 0) {
+        Zerror("Empty file!");
+        fclose(file);
+        return false;
+    }
+    self->fileSize = (ZULong) size;
+    if (fseek(file, ZLANG_CHUNK_SIZE, SEEK_SET) != 0) {
+        Zerror("Could not set file stream to second chunk!");
+        fclose(file);
+        return false;
+    }
     self->file = file;
     return true;
 }

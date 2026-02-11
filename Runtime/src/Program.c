@@ -18,18 +18,17 @@ ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[
     for (--length; length >= 0; --length) {
         if (path[length] == '.') {
             ZString ext = path + length + 1;
-            if (strlen(ext) >= 3 &&
-                tolower(ext[0]) == 'z' &&
-                tolower(ext[1]) == 'a' &&
-                tolower(ext[2]) == 'c') {
+            if (tolower((ZByte) ext[0]) == 'z' &&
+                tolower((ZByte) ext[1]) == 'a' &&
+                tolower((ZByte) ext[2]) == 'c') {
                 break;
             }
             Zerror("Invalid executable file extension!");
-            return ZLANG_ERROR;
+            return false;
         }
         if (length <= 0) {
             Zerror("Cannot execute a directory!");
-            return ZLANG_ERROR;
+            return false;
         }
     }
     if (!ZVector_new(&self->coroutines, ZLANG_VECTOR_DEFAULT)) {
@@ -191,11 +190,10 @@ ZBool ZProgram_loadLibrary(ZProgram *self, ZString path) {
     for (--length; length >= 0; --length) {
         if (path[length] == '.') {
             ZString ext = path + length + 1;
-            if (strlen(ext) >= 4 &&
-                tolower(ext[0]) == 'z' &&
-                tolower(ext[1]) == 'l' &&
-                tolower(ext[2]) == 'i' &&
-                tolower(ext[3]) == 'b') {
+            if (tolower((ZByte) ext[0]) == 'z' &&
+                tolower((ZByte) ext[1]) == 'l' &&
+                tolower((ZByte) ext[2]) == 'i' &&
+                tolower((ZByte) ext[3]) == 'b') {
                 break;
             }
             Zerror("Invalid library file extension!");

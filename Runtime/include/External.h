@@ -16,6 +16,11 @@
 #include <time.h>
 
 // EXTERNAL LIBRARIES
+#ifdef ZLANG_WINDOWS
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 #include <ffi.h>
 
 #endif // ZLANG_EXTERNAL_H

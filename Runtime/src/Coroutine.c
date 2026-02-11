@@ -27,6 +27,7 @@ ZBool ZCoroutine_newMain(ZCoroutine *self, ZUInt argc, const ZString argv[]) {
     self->index = ZLANG_COROUTINE_MAIN;
     self->await = 0;
     self->delayMs = 0;
+    self->id = (ZUShort) time(NULL);
     return true;
 }
 
@@ -63,11 +64,13 @@ ZBool ZCoroutine_newAsync(
     handle->valid = false; // <valid>
     memcpy(self->stack.bottom, &handle->data, handleStart - 1); // <return> + <args...>
     memset(self->stack.bottom + handleStart - 1, 0, sizeof(ZULong)); // <ret>
-    memcpy(&handle->index, &index, sizeof(ZUInt)); // <index>
+    handle->index = index; // <index>
     self->globalOffset = globalOffset;
     self->index = index;
     self->await = 0;
     self->delayMs = 0;
+    self->id = (ZUShort) time(NULL);
+    handle->id = self->id; // <id>
     if (!ZVector_new(&self->dispatcher, ZLANG_VECTOR_DEFAULT)) {
         Zerror("Could not initialize child coroutine dispatcher vector!");
         return false;
@@ -82,7 +85,7 @@ ZBool ZCoroutine_newAsync(
 }
 
 /** Binds a handle to a coroutine. This cannot fail because binding is anonymous. */
-void ZCoroutine_bind(
+ZBool ZCoroutine_bind(
     ZCoroutine *self,
     ZUInt coroCount,
     ZCoroutine *coroutines[],
@@ -99,10 +102,13 @@ void ZCoroutine_bind(
             handleBase,
             sizeof(ZHandle)) == NULL
     ) {
-        return;
+        return true; // safe
     }
     ZHandlePointer ptr = (ZHandlePointer){coroIndex, handleBase};
-    ZVector_push(&self->dispatcher, *(ZULong *) &ptr);
+    if (!ZVector_push(&self->dispatcher, *(ZULong *) &ptr)) {
+        return false; // unsafe
+    }
+    return true; // safe
 }
 
 /** Dispatches the return value of a coroutine. This cannot fail because binding is anonymous. */
@@ -125,7 +131,10 @@ void ZCoroutine_dispatch(
             ptr.offset,
             sizeof(ZHandle)
         );
-        if (handle != NULL && !handle->valid && handle->index == self->index) {
+        if (handle != NULL &&
+            !handle->valid &&
+            handle->index == self->index &&
+            handle->id == self->id) {
             memcpy(&handle->data, self->stack.bottom, ZStack_size(&self->stack));
         }
     }

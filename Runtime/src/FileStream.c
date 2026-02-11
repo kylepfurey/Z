@@ -10,7 +10,7 @@ ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
     Zassert(self != NULL, "<self> was NULL!");
     FILE *file = fopen(path, "rb");
     if (file == NULL) {
-        ZString home = getenv(ZLANG_HOME);
+        ZString home = getenv(ZLANG_HOME_VAR);
         if (home == NULL) {
             Zerror("File not found in directory!");
             return false;
@@ -23,7 +23,7 @@ ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
             return false;
         }
         memcpy(buffer, home, homeLen);
-        buffer[homeLen] = ZLANG_SEPARATOR;
+        buffer[homeLen] = ZLANG_PATH_SEPARATOR;
         memcpy(buffer + homeLen + 1, path, pathLen);
         buffer[homeLen + pathLen + 1] = '\0';
         file = fopen(buffer, "rb");
@@ -68,18 +68,6 @@ ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset) {
         return false;
     }
     self->file = file;
-    return true;
-}
-
-/** Outputs the current byte of a file stream. */
-ZBool ZFileStream_currentByte(ZFileStream *self, ZByte *byte) {
-    Zassert(self != NULL, "<self> was NULL!");
-    Zassert(self->file != NULL, "<self>'s FILE handle was NULL!");
-    Zassert(byte != NULL, "<byte> was NULL!");
-    if (self->byteIndex >= self->chunkSize) {
-        return false;
-    }
-    *byte = self->chunk[self->byteIndex];
     return true;
 }
 
@@ -132,11 +120,37 @@ ZBool ZFileStream_jumpLocal(ZFileStream *self, ZULong localOffset) {
     ZUInt chunk = (localOffset / ZLANG_CHUNK_SIZE) * ZLANG_CHUNK_SIZE;
     if (self->chunkIndex != chunk) {
         self->chunkIndex = chunk;
-        fseek(self->file, chunk, SEEK_SET);
+        if (fseek(self->file, chunk, SEEK_SET) != 0) {
+            Zerror("Invalid local jump!");
+            return false;
+        }
         self->chunkSize = fread(self->chunk, 1, ZLANG_CHUNK_SIZE, self->file);
     }
     self->byteIndex = localOffset % ZLANG_CHUNK_SIZE;
     return self->byteIndex < self->chunkSize;
+}
+
+/** Jumps and returns the file stream at the given global offset in an array of file streams. */
+ZFileStream *ZFileStream_jumpGlobal(
+    ZUInt fileCount,
+    ZFileStream *files[],
+    ZULong globalOffset
+) {
+    Zassert(files != NULL, "<files> was NULL!");
+    while (fileCount > 0 && !ZFileStream_inRange(*files, globalOffset)) {
+        globalOffset -= files[0]->fileSize;
+        ++files;
+        --fileCount;
+    }
+    if (fileCount == 0) {
+        Zerror("Invalid global jump!");
+        return NULL;
+    }
+    if (!ZFileStream_jumpLocal(files[0], globalOffset)) {
+        Zerror("Invalid global jump!");
+        return NULL;
+    }
+    return files[0];
 }
 
 /** Returns the current byte index of a file stream. */

@@ -40,9 +40,6 @@ typedef struct {
 /** Initializes a new file stream. */
 ZLANG_API ZBool ZFileStream_new(ZFileStream *self, ZString path, ZULong globalOffset);
 
-/** Outputs the current byte of a file stream. */
-ZLANG_API ZBool ZFileStream_currentByte(ZFileStream *self, ZByte *byte);
-
 /** Outputs the next byte of a file stream, iterating chunks when needed. */
 ZLANG_API ZBool ZFileStream_nextByte(ZFileStream *self, ZByte *byte);
 
@@ -51,6 +48,13 @@ ZLANG_API ZBool ZFileStream_nextArray(ZFileStream *self, ZUInt size, ZByte *arra
 
 /** Jumps to the given local offset in a file stream. */
 ZLANG_API ZBool ZFileStream_jumpLocal(ZFileStream *self, ZULong localOffset);
+
+/** Jumps and returns the file stream at the given global offset in an array of file streams. */
+ZLANG_API ZFileStream *ZFileStream_jumpGlobal(
+    ZUInt fileCount,
+    ZFileStream *files[],
+    ZULong globalOffset
+);
 
 /** Returns the current local offset of a file stream. */
 ZLANG_API ZULong ZFileStream_localOffset(const ZFileStream *self);

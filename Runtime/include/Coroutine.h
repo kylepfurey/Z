@@ -29,7 +29,10 @@ typedef struct {
     ZUInt await;
 
     /** The delay in milliseconds before resuming this coroutine. */
-    ZULong delayMs;
+    ZUInt delayMs;
+
+    /** A random number used to identify this coroutine. */
+    ZUShort id;
 
     /** A vector of handle pointers used to share this coroutine's return value. */
     ZVector dispatcher;
@@ -46,9 +49,15 @@ typedef struct {
         /** If <valid> is false, this is the index of the remote coroutine. */
         ZUInt index;
 
-        /* If <valid> is true, this is the first 4 bytes of the remote coroutine's return value. */
+        /* If <valid> is true, this is the first byte of the remote coroutine's return value. */
         ZByte data;
     };
+
+    /** A random number used to identify this coroutine. */
+    ZUShort id;
+
+    /** Padding to align this handle to 8 bytes. */
+    ZByte padding;
 } __attribute__((packed)) ZHandle;
 
 #pragma pack(pop)
@@ -76,7 +85,7 @@ ZLANG_API ZBool ZCoroutine_newAsync(
 );
 
 /** Binds a handle to a coroutine. This cannot fail because binding is anonymous. */
-ZLANG_API void ZCoroutine_bind(
+ZLANG_API ZBool ZCoroutine_bind(
     ZCoroutine *self,
     ZUInt coroCount,
     ZCoroutine *coroutines[],

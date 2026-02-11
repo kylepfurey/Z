@@ -47,4 +47,7 @@ typedef char ZChar;
 /** A null-terminated sequence of characters representing text. */
 typedef const ZChar *ZString;
 
+/** A pointer to an anonymous function. */
+typedef void *ZFunc;
+
 #endif // ZLANG_TYPES_H

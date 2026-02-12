@@ -41,6 +41,9 @@ typedef float ZFloat;
 /** A 64-bit floating-point decimal number. */
 typedef double ZDouble;
 
+/** A 128-bit floating-point decimal number. */
+typedef long double ZDecimal;
+
 /** A byte representing a single symbol of text. */
 typedef char ZChar;
 
@@ -48,6 +51,6 @@ typedef char ZChar;
 typedef const ZChar *ZString;
 
 /** A pointer to an anonymous function. */
-typedef void *ZFunc;
+typedef void (*ZFunc)();
 
 #endif // ZLANG_TYPES_H

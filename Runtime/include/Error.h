@@ -46,7 +46,7 @@ do {\
 
 #ifdef ZLANG_DEBUG
 
-/** Crashes the Z runtime with the given message <msg> if <cond> is false. */
+/** Crashes the Z runtime with the given message msg if cond is false. */
 #define Zassert(cond, msg)\
 if (!(cond))\
 fprintf(\

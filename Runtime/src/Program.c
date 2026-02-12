@@ -92,7 +92,18 @@ ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[
         return false;
     }
     if (!ZVector_new(&self->libraries, ZLANG_DEFAULT_CAPACITY)) {
-        Zerror("Could not initialize FFI vector!");
+        Zerror("Could not initialize libraries vector!");
+        ZFileStream_delete(zac);
+        free(zac);
+        ZVector_delete(&self->files);
+        ZCoroutine_delete(main);
+        free(main);
+        ZVector_delete(&self->coroutines);
+        return false;
+    }
+    if (!ZVector_new(&self->types, ZLANG_DEFAULT_CAPACITY)) {
+        Zerror("Could not initialize types vector!");
+        ZVector_delete(&self->libraries);
         ZFileStream_delete(zac);
         free(zac);
         ZVector_delete(&self->files);
@@ -178,7 +189,7 @@ ZBool ZProgram_stopCoroutine(ZProgram *self, ZUInt index, ZBool dispatch) {
     return true;
 }
 
-/** Loads a .zlib library into the Z program. */
+/** Loads a .zlib file at the given path into the Z program. */
 ZBool ZProgram_loadZLibrary(ZProgram *self, ZString path) {
     Zassert(self != NULL, "<self> was NULL!");
     Zassert(path != NULL, "<path> was NULL!");
@@ -228,8 +239,8 @@ ZBool ZProgram_loadZLibrary(ZProgram *self, ZString path) {
     return true;
 }
 
-/** Loads a dynamic library into the Z program. */
-ZBool ZProgram_loadCLibrary(ZProgram *self, ZString name) {
+/** Loads a dynamic library with the given name into the Z program. */
+ZBool ZProgram_loadDynamicLibrary(ZProgram *self, ZString name) {
     Zassert(self != NULL, "<self> was NULL!");
     Zassert(name != NULL, "<name> was NULL!");
     ZLibrary *lib = (ZLibrary *) malloc(sizeof(ZLibrary));
@@ -269,7 +280,14 @@ ZInt ZProgram_execute(ZProgram *self) {
 /** Cleans up all memory owned by a Z program. */
 void ZProgram_delete(ZProgram *self) {
     Zassert(self != NULL, "<self> was NULL!");
-    ZUInt count = self->libraries.count;
+    ZUInt count = self->types.count;
+    for (ZUInt i = 0; i < count; ++i) {
+        ZType *type = (ZType *) ZVector_get(&self->types, i);
+        free(type->type.elements);
+        free(type);
+    }
+    ZVector_delete(&self->types);
+    count = self->libraries.count;
     for (ZUInt i = 0; i < count; ++i) {
         ZLibrary *lib = (ZLibrary *) ZVector_get(&self->libraries, i);
         ZLibrary_delete(lib);

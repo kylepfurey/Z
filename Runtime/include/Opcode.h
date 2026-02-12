@@ -68,26 +68,4 @@ enum {
     ZOPCODE_FLAGS_WIDTH_FOUR = 128,
 };
 
-#pragma pack(push, 1)
-
-/** A single instruction for the Z runtime. */
-typedef struct {
-    /** The enumerated operation for this instruction. */
-    ZByte code;
-
-    /** Bitflags for this instruction. */
-    ZByte flags;
-
-    /** A stack-top offset used for writing. */
-    ZUInt write;
-
-    /** A stack-top offset used for reading. */
-    ZUInt read;
-
-    /** A stack-top offset used for size. */
-    ZUInt size;
-} __attribute__((packed)) ZOpcode;
-
-#pragma pack(pop)
-
 #endif // ZLANG_OPCODE_H

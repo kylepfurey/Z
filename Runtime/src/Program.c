@@ -31,7 +31,7 @@ ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[
             return false;
         }
     }
-    if (!ZVector_new(&self->coroutines, ZLANG_VECTOR_DEFAULT)) {
+    if (!ZVector_new(&self->coroutines, ZLANG_DEFAULT_CAPACITY)) {
         Zerror("Could not initialize coroutine vector!");
         return false;
     }
@@ -56,7 +56,7 @@ ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[
     }
     self->current = 0;
     self->next = 1;
-    if (!ZVector_new(&self->files, ZLANG_VECTOR_DEFAULT)) {
+    if (!ZVector_new(&self->files, ZLANG_DEFAULT_CAPACITY)) {
         Zerror("Could not initialize fileStream vector!");
         ZCoroutine_delete(main);
         free(main);
@@ -91,7 +91,7 @@ ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[
         ZVector_delete(&self->coroutines);
         return false;
     }
-    if (!ZVector_new(&self->libraries, ZLANG_VECTOR_DEFAULT)) {
+    if (!ZVector_new(&self->libraries, ZLANG_DEFAULT_CAPACITY)) {
         Zerror("Could not initialize FFI vector!");
         ZFileStream_delete(zac);
         free(zac);
@@ -231,7 +231,7 @@ ZBool ZProgram_loadZLibrary(ZProgram *self, ZString path) {
 /** Loads a dynamic library into the Z program. */
 ZBool ZProgram_loadCLibrary(ZProgram *self, ZString name) {
     Zassert(self != NULL, "<self> was NULL!");
-    Zassert(name != NULL, "<nameNoExt> was NULL!");
+    Zassert(name != NULL, "<name> was NULL!");
     ZLibrary *lib = (ZLibrary *) malloc(sizeof(ZLibrary));
     if (lib == NULL) {
         Zerror("Could not allocate dynamic library!");

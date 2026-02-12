@@ -7,7 +7,11 @@
 /** Initializes a new dynamic library. */
 ZBool ZLibrary_new(ZLibrary *self, ZString name) {
     Zassert(self != NULL, "<self> was NULL!");
-    Zassert(name != NULL, "<nameNoExt> was NULL!");
+    Zassert(name != NULL, "<name> was NULL!");
+    if (!ZVector_new(&self->ffi, ZLANG_DEFAULT_CAPACITY)) {
+        Zerror("Could not initialize dynamic library FFI vector!");
+        return false;
+    }
     ZULong nameLen = strlen(name);
     ZChar *buffer;
 
@@ -187,7 +191,7 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
 }
 
 /** Returns a function pointer from a dynamic library via its name. */
-ZFunc ZLibrary_get(ZLibrary *self, ZString func) {
+ZFunc ZLibrary_find(ZLibrary *self, ZString func) {
     Zassert(self != NULL, "<self> was NULL!");
     Zassert(func != NULL, "<func> was NULL!");
     Zassert(self->handle != NULL, "<self>'s handle was NULL!");
@@ -230,4 +234,22 @@ void ZLibrary_delete(ZLibrary *self) {
 #endif
 
     self->handle = NULL;
+    for (ZUInt i = 0; i < self->ffi.count; ++i) {
+        ZFFI *ffi = (ZFFI *) ZVector_get(&self->ffi, i);
+        ZFFI_delete(ffi);
+        free(ffi);
+    }
+    ZVector_delete(&self->ffi);
+}
+
+/** Initializes a new foreign function interface. */
+ZBool ZFFI_new(ZFFI *self, ZCoroutine *coroutine) {
+    Zassert(self != NULL, "<self> was NULL!");
+    Zassert(coroutine != NULL, "<coroutine> was NULL!");
+    return true;
+}
+
+/** Cleans up all memory owned by a foreign function interface. */
+void ZFFI_delete(ZFFI *self) {
+    Zassert(self != NULL, "<self> was NULL!");
 }

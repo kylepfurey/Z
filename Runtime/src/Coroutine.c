@@ -71,7 +71,7 @@ ZBool ZCoroutine_newAsync(
     self->delayMs = 0;
     self->id = (ZUShort) time(NULL);
     handle->id = self->id; // <id>
-    if (!ZVector_new(&self->dispatcher, ZLANG_VECTOR_DEFAULT)) {
+    if (!ZVector_new(&self->dispatcher, ZLANG_DEFAULT_CAPACITY)) {
         Zerror("Could not initialize child coroutine dispatcher vector!");
         return false;
     }

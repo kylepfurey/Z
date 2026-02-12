@@ -8,7 +8,7 @@
 #include <Types.h>
 
 /** The default capacity for vectors. */
-#define ZLANG_VECTOR_DEFAULT 8
+#define ZLANG_DEFAULT_CAPACITY 8
 
 /** A minimal dynamic array. */
 typedef struct {

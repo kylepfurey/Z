@@ -4,7 +4,7 @@
 
 #include <ZLang.h>
 
-/** Initializes a new dynamic library. */
+/** Initializes a new dynamic library. "libc" loads the standard library. */
 ZBool ZLibrary_new(ZLibrary *self, ZString name) {
     Zassert(self != NULL, "<self> was NULL!");
     Zassert(name != NULL, "<name> was NULL!");
@@ -19,9 +19,22 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
 
     // *.dll
 
+    if (nameLen == 4 && strncmp(name, "libc", 4) == 0) {
+        self->handle = LoadLibraryA("ucrtbase.dll");
+        if (self->handle == NULL || GetProcAddress(self->handle, "printf") == NULL) {
+            self->handle = LoadLibraryA("msvcrt.dll");
+            if (self->handle == NULL || GetProcAddress(self->handle, "printf") == NULL) {
+                Zerror("Could not locate libc!");
+                ZVector_delete(&self->ffi);
+                return false;
+            }
+        }
+        return true;
+    }
     buffer = (ZChar *) malloc(nameLen + 5); // [.][d][l][l][\0]
     if (buffer == NULL) {
         Zerror("Could not allocate buffer for dynamic library name!");
+        ZVector_delete(&self->ffi);
         return false;
     }
     memcpy(buffer, name, nameLen);
@@ -36,12 +49,14 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         ZString home = getenv(ZLANG_HOME_VAR);
         if (home == NULL) {
             Zerror("Dynamic library not found in directory!");
+            ZVector_delete(&self->ffi);
             return false;
         }
         ZULong homeLen = strlen(home);
         buffer = (ZChar *) malloc(homeLen + nameLen + 6); // [/]...[.][d][l][l][\0]
         if (buffer == NULL) {
             Zerror("Could not allocate buffer for Z_HOME path + dynamic library name!");
+            ZVector_delete(&self->ffi);
             return false;
         }
         memcpy(buffer, home, homeLen);
@@ -57,6 +72,7 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         free(buffer);
         if (self->handle == NULL) {
             Zerror("Dynamic library not found in directory or Z_HOME!");
+            ZVector_delete(&self->ffi);
             return false;
         }
     } else {
@@ -72,9 +88,22 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
 
     // lib*.dylib
 
+    if (nameLen == 4 && strncmp(name, "libc", 4) == 0) {
+        self->handle = dlopen("/usr/lib/libSystem.B.dylib", RTLD_NOW | RTLD_GLOBAL);
+        if (self->handle == NULL || dlsym(self->handle, "printf") == NULL) {
+            self->handle = dlopen("libSystem.B.dylib", RTLD_NOW | RTLD_GLOBAL);
+            if (self->handle == NULL || dlsym(self->handle, "printf") == NULL) {
+                Zerror("Could not locate libc!");
+                ZVector_delete(&self->ffi);
+                return false;
+            }
+        }
+        return true;
+    }
     buffer = (ZChar *) malloc(nameLen + 10); // [l][i][b]...[.][d][y][l][i][b][\0]
     if (buffer == NULL) {
         Zerror("Could not allocate buffer for dynamic library name!");
+        ZVector_delete(&self->ffi);
         return false;
     }
     buffer[0] = 'l';
@@ -94,12 +123,14 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         ZString home = getenv(ZLANG_HOME_VAR);
         if (home == NULL) {
             Zerror("Dynamic library not found in directory!");
+            ZVector_delete(&self->ffi);
             return false;
         }
         ZULong homeLen = strlen(home);
         buffer = (ZChar *) malloc(homeLen + nameLen + 11); // [/][l][i][b]...[.][d][y][l][i][b][\0]
         if (buffer == NULL) {
             Zerror("Could not allocate buffer for Z_HOME path + dynamic library name!");
+            ZVector_delete(&self->ffi);
             return false;
         }
         memcpy(buffer, home, homeLen);
@@ -120,6 +151,7 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         free(buffer);
         if (self->handle == NULL) {
             Zerror("Dynamic library not found in directory or Z_HOME!");
+            ZVector_delete(&self->ffi);
             return false;
         }
     } else {
@@ -131,9 +163,22 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
 
     // lib*.so
 
+    if (nameLen == 4 && strncmp(name, "libc", 4) == 0) {
+        self->handle = dlopen("libc.so.6", RTLD_NOW | RTLD_GLOBAL);
+        if (self->handle == NULL || dlsym(self->handle, "printf") == NULL) {
+            self->handle = dlopen("libc.so", RTLD_NOW | RTLD_GLOBAL);
+            if (self->handle == NULL || dlsym(self->handle, "printf") == NULL) {
+                Zerror("Could not locate libc!");
+                ZVector_delete(&self->ffi);
+                return false;
+            }
+        }
+        return true;
+    }
     buffer = (ZChar *) malloc(nameLen + 7); // [l][i][b]...[.][s][o][\0]
     if (buffer == NULL) {
         Zerror("Could not allocate buffer for dynamic library name!");
+        ZVector_delete(&self->ffi);
         return false;
     }
     buffer[0] = 'l';
@@ -150,12 +195,14 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         ZString home = getenv(ZLANG_HOME_VAR);
         if (home == NULL) {
             Zerror("Dynamic library not found in directory!");
+            ZVector_delete(&self->ffi);
             return false;
         }
         ZULong homeLen = strlen(home);
         buffer = (ZChar *) malloc(homeLen + nameLen + 8); // [/][l][i][b]...[.][s][o][\0]
         if (buffer == NULL) {
             Zerror("Could not allocate buffer for Z_HOME path + dynamic library name!");
+            ZVector_delete(&self->ffi);
             return false;
         }
         memcpy(buffer, home, homeLen);
@@ -173,6 +220,7 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         free(buffer);
         if (self->handle == NULL) {
             Zerror("Dynamic library not found in directory or Z_HOME!");
+            ZVector_delete(&self->ffi);
             return false;
         }
     } else {
@@ -187,6 +235,7 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
 #endif
 
     Zerror("Cannot load with unknown dynamic library format!");
+    ZVector_delete(&self->ffi);
     return false;
 }
 
@@ -214,6 +263,45 @@ ZFunc ZLibrary_find(ZLibrary *self, ZString func) {
     return NULL;
 }
 
+/** Invokes the foreign function stored in the library with the given index. */
+ZBool ZLibrary_call(ZLibrary *self, ZUInt func, ZStack *stack) {
+    Zassert(self != NULL, "<self> was NULL!");
+    Zassert(self->handle != NULL, "<self>'s handle was NULL!");
+    if (func >= self->ffi.count) {
+        Zerror("Invalid FFI index!");
+        return false;
+    }
+    ZFFI *ffi = (ZFFI *) ZVector_get(&self->ffi, func);
+    Zassert(ffi->signature != NULL, "<ffi>'s signature array was NULL!");
+    Zassert(ffi->func != NULL, "<ffi>'s func was NULL!");
+    void *returnValue;
+    if (ffi->signature[0] > 0) {
+        returnValue = ZStack_peekTop(stack, ffi->signature[0], (ZULong) ffi->cif.rtype->size);
+        if (returnValue == NULL) {
+            Zerror("Could not retrieve return type offset from FFI call!");
+            return false;
+        }
+    } else {
+        returnValue = NULL;
+    }
+    void **argValues = (void **) malloc(ffi->signature[1] * sizeof(void *));
+    if (argValues == NULL) {
+        Zerror("Could not allocate argument type offsets for FFI call!");
+        return false;
+    }
+    for (ZUInt i = 0; i < ffi->signature[1]; ++i) {
+        argValues[i] = ZStack_peekTop(stack, ffi->signature[i + 2], (ZULong) ffi->cif.arg_types[i]->size);
+        if (argValues[i] == NULL) {
+            Zerror("Could not retrieve argument type offset from FFI call!");
+            free(argValues);
+            return false;
+        }
+    }
+    ffi_call(&ffi->cif, ffi->func, returnValue, argValues);
+    free(argValues);
+    return true;
+}
+
 /** Cleans up all memory owned by a dynamic library. */
 void ZLibrary_delete(ZLibrary *self) {
     Zassert(self != NULL, "<self> was NULL!");
@@ -236,7 +324,10 @@ void ZLibrary_delete(ZLibrary *self) {
     self->handle = NULL;
     for (ZUInt i = 0; i < self->ffi.count; ++i) {
         ZFFI *ffi = (ZFFI *) ZVector_get(&self->ffi, i);
+        free(ffi->signature);
+        ffi->signature = NULL;
         free(ffi->cif.arg_types);
+        ffi->cif = (ffi_cif){0};
         free(ffi);
     }
     ZVector_delete(&self->ffi);

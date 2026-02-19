@@ -18,13 +18,23 @@
 #include <ctype.h>
 #include <time.h>
 
+#ifdef ZLANG_SIGINT
+
+#include <signal.h>
+
+#endif
+
 // EXTERNAL LIBRARIES
 #ifdef ZLANG_WINDOWS
+
 #include <windows.h>
+
 #endif
 
 #ifdef ZLANG_POSIX
+
 #include <dlfcn.h>
+
 #endif
 
 #include <ffi.h>

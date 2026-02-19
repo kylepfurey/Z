@@ -6,9 +6,13 @@
 #define ZLANG_LIBRARY_H
 
 #include <Vector.h>
+#include <Stack.h>
 
 /** Denotes that an FFI function is not a varadic function. */
 #define ZLANG_CALL_NO_VARADIC UINT_MAX
+
+/** Denotes at runtime that an FFI call is for libc. */
+#define ZLANG_FFI_LIBC UINT_MAX
 
 /**
  * Each enumerated primitive type.
@@ -51,16 +55,25 @@ typedef struct {
 
 /** Data for a foreign function interface. */
 typedef struct {
-    /** The interface of this foreign function. */
+    /** The interface of this foreign function. cif.arg_types must be freed! */
     ffi_cif cif;
 
     /** A pointer to the foreign function. */
     ZFunc func;
+
+    /**
+     * Cached data for the function signature.
+     * [0] = Return Stack Offset
+     * [1] = Argument Count
+     * [...] = Argument Stack Offset
+     * This must be freed!
+     */
+    ZUInt *signature;
 } ZFFI;
 
 /** Data for a static type. */
 typedef struct {
-    /** The interface of this static type. */
+    /** The interface of this static type. type.elements must be freed! */
     ffi_type type;
 } ZType;
 
@@ -83,11 +96,14 @@ typedef struct {
 
 #pragma pack(pop)
 
-/** Initializes a new dynamic library. */
+/** Initializes a new dynamic library. "libc" loads the standard library. */
 ZLANG_API ZBool ZLibrary_new(ZLibrary *self, ZString name);
 
 /** Returns a function pointer from a dynamic library via its name. */
 ZLANG_API ZFunc ZLibrary_find(ZLibrary *self, ZString func);
+
+/** Invokes the foreign function stored in the library with the given index. */
+ZLANG_API ZBool ZLibrary_call(ZLibrary *self, ZUInt func, ZStack *stack);
 
 /** Cleans up all memory owned by a dynamic library. */
 ZLANG_API void ZLibrary_delete(ZLibrary *self);

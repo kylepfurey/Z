@@ -1,5 +1,5 @@
 // .h
-// Z Export Macro
+// Z Export Macros
 // by Kyle Furey
 
 #ifndef ZLANG_EXPORT_H
@@ -41,12 +41,15 @@
 
 #ifdef ZLANG_EXPORTS
 
-/** Windows Export */
+/** Windows export. */
 #define ZLANG_API __declspec(dllexport)
+
+/** Defined if SIGINT is a valid way to kill a Z program. */
+#define ZLANG_SIGINT
 
 #else
 
-/** Windows Import */
+/** Windows import. */
 #define ZLANG_API __declspec(dllimport)
 
 #endif
@@ -58,13 +61,16 @@
 
 #ifdef ZLANG_EXPORTS
 
-/** MacOS / Linux Export */
+/** MacOS / Linux export. */
 #define ZLANG_API __attribute__((visibility("default")))
 
 #else
 
-/** Fallback */
+/** Fallback. */
 #define ZLANG_API
+
+/** Defined if SIGINT is a valid way to kill a Z program. */
+#define ZLANG_SIGINT
 
 #endif
 

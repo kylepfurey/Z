@@ -4,6 +4,22 @@
 
 #include <ZLang.h>
 
+#ifdef ZLANG_SIGINT
+
+/** A pointer to the last opened Z program. This is solely used for SIGINT. */
+ZProgram *ZProgram_instance = NULL;
+
+/** Z program SIGINT handler. */
+void ZProgram_kill(int code) {
+    printf("\n");
+    Zlog("SIGINT.");
+    ZProgram_delete(ZProgram_instance);
+    signal(SIGINT, NULL);
+    raise(SIGINT);
+}
+
+#endif
+
 /** Initializes a new Z program. */
 ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[]) {
     Zassert(self != NULL, "<self> was NULL!");
@@ -91,6 +107,27 @@ ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[
         ZVector_delete(&self->coroutines);
         return false;
     }
+    // ZProgram::libc is manually configured
+    {
+        if (!ZLibrary_new(&self->libc, "libc")) {
+            Zerror("Could not initialize libc library!");
+            ZFileStream_delete(zac);
+            free(zac);
+            ZVector_delete(&self->files);
+            ZCoroutine_delete(main);
+            free(main);
+            ZVector_delete(&self->coroutines);
+            return false;
+        }
+    }
+
+#ifdef ZLANG_SIGINT
+
+    ZProgram_instance = self;
+    signal(SIGINT, (__sighandler_t) ZProgram_kill);
+
+#endif
+
     return true;
 }
 
@@ -236,6 +273,7 @@ ZInt ZProgram_execute(ZProgram *self) {
 /** Cleans up all memory owned by a Z program. */
 void ZProgram_delete(ZProgram *self) {
     Zassert(self != NULL, "<self> was NULL!");
+    ZLibrary_delete(&self->libc);
     ZUInt count = self->files.count;
     for (ZUInt i = 0; i < count; ++i) {
         ZFileStream *file = (ZFileStream *) ZVector_get(&self->files, i);
@@ -252,4 +290,11 @@ void ZProgram_delete(ZProgram *self) {
         }
     }
     ZVector_delete(&self->coroutines);
+
+#ifdef ZLANG_SIGINT
+
+    ZProgram_instance = NULL;
+    signal(SIGINT, NULL);
+
+#endif
 }

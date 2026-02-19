@@ -5,7 +5,7 @@
 #ifndef ZLANG_PROGRAM_H
 #define ZLANG_PROGRAM_H
 
-#include <Vector.h>
+#include <Library.h>
 
 /** All data related to the runtime of a single Z program. */
 typedef struct {
@@ -23,6 +23,9 @@ typedef struct {
 
     /** A vector of pointers to file streams in global order. */
     ZVector files;
+
+    /** The C standard library. */
+    ZLibrary libc;
 } ZProgram;
 
 /** Initializes a new Z program. */

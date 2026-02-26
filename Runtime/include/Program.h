@@ -5,6 +5,8 @@
 #ifndef ZLANG_PROGRAM_H
 #define ZLANG_PROGRAM_H
 
+#include <Coroutine.h>
+#include <FileStream.h>
 #include <Library.h>
 
 /** All data related to the runtime of a single Z program. */
@@ -44,6 +46,22 @@ ZLANG_API ZBool ZProgram_stopCoroutine(ZProgram *self, ZUInt index, ZBool dispat
 
 /** Loads a .zlib file at the given path into the Z program. */
 ZLANG_API ZBool ZProgram_loadLibrary(ZProgram *self, ZString path);
+
+/** Binds a foreign function to the Z program. */
+ZLANG_API ZBool ZProgram_bind(
+    ZProgram *self,
+    ZFileStream *file,
+    ZUInt library
+);
+
+/** Calls a foreign function from the Z program's libraries. */
+ZLANG_API ZBool ZProgram_call(
+    ZProgram *self,
+    ZFileStream *file,
+    ZCoroutine *coro,
+    ZUInt library,
+    ZUInt ffi
+);
 
 /** Executes the next coroutine in a Z program. Returns whether the program can continue. */
 ZLANG_API ZBool ZProgram_step(ZProgram *self);

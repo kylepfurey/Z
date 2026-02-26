@@ -206,6 +206,81 @@ ZBool ZFileStream_loadLibrary(ZFileStream *self, ZString name) {
     return true;
 }
 
+/** Stores a new struct type in the file stream. */
+ZBool ZFileStream_putType(ZFileStream *self, ZUInt count, ZUInt elements[]) {
+    Zassert(self != NULL, "<self> was NULL!");
+    ZType *newType = (ZType *) malloc(sizeof(ZType));
+    if (newType == NULL) {
+        Zerror("Could not allocate new type!");
+        return false;
+    }
+    ZType **types = (ZType **) malloc(count * sizeof(ZType *));
+    if (types == NULL) {
+        Zerror("Could not allocate new type's element array!");
+        free(newType);
+        return false;
+    }
+    for (ZUInt i = 0; i < count; ++i) {
+        ZType *type = ZFileStream_getType(self, elements[i]);
+        if (type == NULL) {
+            Zerror("Nonexistent type!");
+            free(types);
+            free(newType);
+            return false;
+        }
+        types[i] = type;
+    }
+    newType->size = 0;
+    newType->alignment = 0;
+    newType->type = FFI_TYPE_STRUCT;
+    newType->elements = (ffi_type **) types;
+    if (!ZVector_push(&self->types, (ZULong) newType)) {
+        Zerror("Could not insert new type!");
+        free(types);
+        free(newType);
+        return false;
+    }
+    return true;
+}
+
+/** Returns a pointer to the file stream type with the given index. */
+ZType *ZFileStream_getType(const ZFileStream *self, ZUInt index) {
+    Zassert(self != NULL, "<self> was NULL!");
+    switch (index) {
+        case ZLANG_TYPE_VOID:
+            return &ffi_type_void;
+        case ZLANG_TYPE_BYTE:
+            return &ffi_type_uint8;
+        case ZLANG_TYPE_SBYTE:
+            return &ffi_type_sint8;
+        case ZLANG_TYPE_USHORT:
+            return &ffi_type_uint16;
+        case ZLANG_TYPE_SHORT:
+            return &ffi_type_sint16;
+        case ZLANG_TYPE_UINT:
+            return &ffi_type_uint32;
+        case ZLANG_TYPE_INT:
+            return &ffi_type_sint32;
+        case ZLANG_TYPE_ULONG:
+            return &ffi_type_uint64;
+        case ZLANG_TYPE_LONG:
+            return &ffi_type_sint64;
+        case ZLANG_TYPE_FLOAT:
+            return &ffi_type_float;
+        case ZLANG_TYPE_DOUBLE:
+            return &ffi_type_double;
+        case ZLANG_TYPE_PTR:
+            return &ffi_type_pointer;
+        case ZLANG_TYPE_DECIMAL:
+            return &ffi_type_longdouble;
+        default:
+            if (index < self->types.count) {
+                return (ZType *) ZVector_get(&self->types, index - ZLANG_TYPE_STRUCT);
+            }
+            return NULL;
+    }
+}
+
 /** Cleans up all memory owned by a file stream. */
 void ZFileStream_delete(ZFileStream *self) {
     Zassert(self != NULL, "<self> was NULL!");
@@ -213,7 +288,7 @@ void ZFileStream_delete(ZFileStream *self) {
     ZUInt count = self->types.count;
     for (ZUInt i = 0; i < count; ++i) {
         ZType *type = (ZType *) ZVector_get(&self->types, i);
-        free(type->type.elements);
+        free(type->elements);
         free(type);
     }
     ZVector_delete(&self->types);

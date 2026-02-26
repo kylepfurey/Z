@@ -5,7 +5,7 @@
 #ifndef ZLANG_FILESTREAM_H
 #define ZLANG_FILESTREAM_H
 
-#include <Vector.h>
+#include <Library.h>
 
 /** The size of a single file chunk loaded into memory. */
 #define ZLANG_CHUNK_SIZE 1024
@@ -73,6 +73,12 @@ ZLANG_API ZBool ZFileStream_inRange(const ZFileStream *self, ZULong globalOffset
 
 /** Loads a dynamic library with the given name into the file stream. */
 ZLANG_API ZBool ZFileStream_loadLibrary(ZFileStream *self, ZString name);
+
+/** Stores a new struct type in the file stream. */
+ZLANG_API ZBool ZFileStream_putType(ZFileStream *self, ZUInt count, ZUInt elements[]);
+
+/** Returns a pointer to the file stream type with the given index. */
+ZLANG_API ZType *ZFileStream_getType(const ZFileStream *self, ZUInt index);
 
 /** Cleans up all memory owned by a file stream. */
 ZLANG_API void ZFileStream_delete(ZFileStream *self);

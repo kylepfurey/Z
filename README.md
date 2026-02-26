@@ -1,2 +1,2 @@
 # Z
-Z language compiler and runtime.
+Z language compiler / assembler and runtime.

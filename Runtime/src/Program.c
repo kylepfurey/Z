@@ -107,18 +107,15 @@ ZBool ZProgram_new(ZProgram *self, ZString path, ZUInt argc, const ZString argv[
         ZVector_delete(&self->coroutines);
         return false;
     }
-    // ZProgram::libc is manually configured
-    {
-        if (!ZLibrary_new(&self->libc, "libc")) {
-            Zerror("Could not initialize libc library!");
-            ZFileStream_delete(zac);
-            free(zac);
-            ZVector_delete(&self->files);
-            ZCoroutine_delete(main);
-            free(main);
-            ZVector_delete(&self->coroutines);
-            return false;
-        }
+    if (!ZLibrary_new(&self->libc, "libc")) {
+        Zerror("Could not initialize libc library!");
+        ZFileStream_delete(zac);
+        free(zac);
+        ZVector_delete(&self->files);
+        ZCoroutine_delete(main);
+        free(main);
+        ZVector_delete(&self->coroutines);
+        return false;
     }
 
 #ifdef ZLANG_SIGINT
@@ -142,7 +139,6 @@ ZBool ZProgram_startCoroutine(
     ZCoroutine *coro = (ZCoroutine *) malloc(sizeof(ZCoroutine));
     if (coro == NULL) {
         Zerror("Could not allocate async coroutine!");
-        ZVector_delete(&self->coroutines);
         return false;
     }
     ZCoroutine *parent = (ZCoroutine *) ZVector_get(&self->coroutines, self->current);
@@ -250,6 +246,128 @@ ZBool ZProgram_loadLibrary(ZProgram *self, ZString path) {
         Zerror("Could not insert ZLIB file stream!");
         ZFileStream_delete(zlib);
         free(zlib);
+        return false;
+    }
+    return true;
+}
+
+/** Binds a foreign function to the Z program. */
+ZBool ZProgram_bind(
+    ZProgram *self,
+    ZFileStream *file,
+    ZUInt library
+) {
+    Zassert(self != NULL, "<self> was NULL!");
+    Zassert(file != NULL, "<file> was NULL!");
+    ZLibrary *lib;
+    if (library == ZLANG_FFI_LIBC) {
+        lib = &self->libc;
+    } else if (library >= file->libraries.count) {
+        lib = (ZLibrary *) ZVector_get(&file->libraries, library);
+    } else {
+        Zerror("Invalid FFI library index!");
+        return false;
+    }
+    ZUInt length;
+    if (!ZFileStream_nextArray(file, sizeof(ZUInt), (ZByte *) &length)) {
+        Zerror("Unable to read FFI binding name length!");
+        return false;
+    }
+    ZChar *str = (ZChar *) malloc(length * sizeof(ZChar));
+    if (str == NULL) {
+        Zerror("Could not allocate FFI binding name!");
+        return false;
+    }
+    if (!ZFileStream_nextArray(file, length, (ZByte *) &str)) {
+        Zerror("Unable to read FFI binding name!");
+        free(str);
+        return false;
+    }
+    ZCall call;
+    if (!ZFileStream_nextArray(file, sizeof(ZCall), (ZByte *) &call)) {
+        Zerror("Unable to read FFI binding call!");
+        free(str);
+        return false;
+    }
+    ZType *returnType = ZFileStream_getType(file, call.returnType);
+    if (returnType == NULL) {
+        Zerror("FFI binding has invalid return type!");
+        free(str);
+        return false;
+    }
+    ZUInt argCount = call.varArgs == ZLANG_CALL_NO_VARADIC ? call.fixedArgs : call.fixedArgs + call.varArgs;
+    ZUInt *argIndicies = (ZUInt *) malloc((argCount + 1) * sizeof(ZUInt));
+    if (argIndicies == NULL) {
+        Zerror("Could not allocate FFI binding argument indicies!");
+        free(str);
+        return false;
+    }
+    ZType **argTypes = (ZType **) malloc((argCount + 1) * sizeof(ZType *));
+    if (argTypes == NULL) {
+        Zerror("Could not allocate FFI binding arguments!");
+        free(argIndicies);
+        free(str);
+        return false;
+    }
+    for (ZUInt i = 0; i < argCount; ++i) {
+        ZType *type = ZFileStream_getType(file, argIndicies[i]);
+        if (type == NULL) {
+            Zerror("FFI binding has invalid return type!");
+            free(argTypes);
+            free(argIndicies);
+            free(str);
+            return false;
+        }
+        argTypes[i] = type;
+    }
+    free(argIndicies);
+    if (!ZFileStream_nextArray(file, argCount * sizeof(ZUInt), (ZByte *) &argIndicies)) {
+        Zerror("Unable to read FFI binding arguments!");
+        free(argTypes);
+        free(str);
+        return false;
+    }
+    if (!ZLibrary_bind(
+        lib,
+        str,
+        call.abi,
+        call.fixedArgs,
+        call.varArgs,
+        returnType,
+        argTypes
+    )) {
+        Zerror("Invalid FFI binding!");
+        free(argTypes);
+        free(str);
+        return false;
+    }
+    free(argTypes);
+    free(str);
+    return true;
+}
+
+/** Calls a foreign function from the Z program's libraries. */
+ZBool ZProgram_call(
+    ZProgram *self,
+    ZFileStream *file,
+    ZCoroutine *coro,
+    ZUInt library,
+    ZUInt ffi
+) {
+    Zassert(self != NULL, "<self> was NULL!");
+    Zassert(file != NULL, "<file> was NULL!");
+    Zassert(coro != NULL, "<coro> was NULL!");
+    ZLibrary *lib;
+    if (library == ZLANG_FFI_LIBC) {
+        lib = &self->libc;
+    } else if (library >= file->libraries.count) {
+        lib = (ZLibrary *) ZVector_get(&file->libraries, library);
+    } else {
+        Zerror("Invalid FFI library index!");
+        return false;
+    }
+    if (!ZLibrary_call(lib, ffi, &coro->stack)) {
+        Zerror("Invalid FFI function index!");
         return false;
     }
     return true;

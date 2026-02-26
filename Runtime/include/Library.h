@@ -11,6 +11,9 @@
 /** Denotes that an FFI function is not a varadic function. */
 #define ZLANG_CALL_NO_VARADIC UINT_MAX
 
+/** Denotes that an FFI function uses the default OS ABI. */
+#define ZLANG_DEFAULT_ABI UINT_MAX
+
 /** Denotes at runtime that an FFI call is for libc. */
 #define ZLANG_FFI_LIBC UINT_MAX
 
@@ -72,23 +75,20 @@ typedef struct {
 } ZFFI;
 
 /** Data for a static type. */
-typedef struct {
-    /** The interface of this static type. type.elements must be freed! */
-    ffi_type type;
-} ZType;
+typedef ffi_type ZType;
 
 #pragma pack(push, 1)
 
 /** Metadata for a foreign function interface call. */
 typedef struct {
-    /** The ABI of this foreign function call. */
+    /** The ABI of this foreign function call. ZLANG_DEFAULT_ABI is for default ABI. */
     ZUInt abi;
 
     /** The total number of typed arguments. Argument type indicies follow this structure. */
-    ZUInt argCount;
+    ZUInt fixedArgs;
 
     /** The total number of varadic arguments. ZLANG_CALL_NO_VARADIC ignores this. */
-    ZUInt varCount;
+    ZUInt varArgs;
 
     /** The type index of the return type. */
     ZUInt returnType;
@@ -100,10 +100,21 @@ typedef struct {
 ZLANG_API ZBool ZLibrary_new(ZLibrary *self, ZString name);
 
 /** Returns a function pointer from a dynamic library via its name. */
-ZLANG_API ZFunc ZLibrary_find(ZLibrary *self, ZString func);
+ZLANG_API ZFunc ZLibrary_find(ZLibrary *self, ZString name);
+
+/** Binds a new foreign function to the library. */
+ZLANG_API ZBool ZLibrary_bind(
+    ZLibrary *self,
+    ZString name,
+    ZUInt abi,
+    ZUInt fixedArgs,
+    ZUInt varArgs,
+    ZType *returnType,
+    ZType *argTypes[]
+);
 
 /** Invokes the foreign function stored in the library with the given index. */
-ZLANG_API ZBool ZLibrary_call(ZLibrary *self, ZUInt func, ZStack *stack);
+ZLANG_API ZBool ZLibrary_call(ZLibrary *self, ZUInt index, ZStack *stack);
 
 /** Cleans up all memory owned by a dynamic library. */
 ZLANG_API void ZLibrary_delete(ZLibrary *self);

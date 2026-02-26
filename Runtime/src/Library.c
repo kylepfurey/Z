@@ -240,20 +240,20 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
 }
 
 /** Returns a function pointer from a dynamic library via its name. */
-ZFunc ZLibrary_find(ZLibrary *self, ZString func) {
+ZFunc ZLibrary_find(ZLibrary *self, ZString name) {
     Zassert(self != NULL, "<self> was NULL!");
-    Zassert(func != NULL, "<func> was NULL!");
+    Zassert(name != NULL, "<name> was NULL!");
     Zassert(self->handle != NULL, "<self>'s handle was NULL!");
 
 #ifdef ZLANG_WINDOWS
 
-    return (ZFunc) GetProcAddress(self->handle, func);
+    return (ZFunc) GetProcAddress(self->handle, name);
 
 #else
 
 #ifdef ZLANG_POSIX
 
-    return (ZFunc) dlsym(self->handle, func);
+    return (ZFunc) dlsym(self->handle, name);
 
 #endif
 
@@ -263,15 +263,102 @@ ZFunc ZLibrary_find(ZLibrary *self, ZString func) {
     return NULL;
 }
 
-/** Invokes the foreign function stored in the library with the given index. */
-ZBool ZLibrary_call(ZLibrary *self, ZUInt func, ZStack *stack) {
+/** Binds a new foreign function to the library. */
+ZBool ZLibrary_bind(
+    ZLibrary *self,
+    ZString name,
+    ZUInt abi,
+    ZUInt fixedArgs,
+    ZUInt varArgs,
+    ZType *returnType,
+    ZType *argTypes[]
+) {
     Zassert(self != NULL, "<self> was NULL!");
+    Zassert(name != NULL, "<name> was NULL!");
+    Zassert(returnType != NULL, "<returnType> was NULL! Pass &ffi_type_void for void!");
+    ZUInt argCount = varArgs == ZLANG_CALL_NO_VARADIC ? fixedArgs : fixedArgs + varArgs;
+    Zassert(argTypes != NULL || argCount == 0, "<argTypes> was NULL when args > 0!");
+    abi = abi == ZLANG_DEFAULT_ABI ? FFI_DEFAULT_ABI : abi;
+    ZFFI *ffi = (ZFFI *) malloc(sizeof(ZFFI));
+    if (ffi == NULL) {
+        Zerror("Could not allocate FFI binding!");
+        return false;
+    }
+    ZType **src = argTypes;
+    argTypes = (ZType **) malloc((argCount + 1) * sizeof(ZType *));
+    if (argTypes == NULL) {
+        Zerror("Could not allocate array for FFI argument types!");
+        free(ffi);
+        return false;
+    }
+    memcpy(argTypes, src, argCount * sizeof(ZType *));
+    argTypes[argCount] = NULL;
+    ffi_status result;
+    if (varArgs == ZLANG_CALL_NO_VARADIC) {
+        result = ffi_prep_cif(
+            &ffi->cif,
+            (ffi_abi) abi,
+            (unsigned int) fixedArgs,
+            (ffi_type *) returnType,
+            (ffi_type **) argTypes
+        );
+    } else {
+        result = ffi_prep_cif_var(
+            &ffi->cif,
+            (ffi_abi) abi,
+            (unsigned int) fixedArgs,
+            (unsigned int) argCount,
+            (ffi_type *) returnType,
+            (ffi_type **) argTypes
+        );
+    }
+    if (result != FFI_OK) {
+        Zerror("Could not prepare FFI binding!");
+        free(argTypes);
+        free(ffi);
+        return false;
+    }
+    ffi->cif.arg_types = (ffi_type **) argTypes;
+    ffi->func = ZLibrary_find(self, name);
+    if (ffi->func == NULL) {
+        Zerror("Could not find FFI function!");
+        free(argTypes);
+        free(ffi);
+        return false;
+    }
+    ZUInt *signature = (ZUInt *) malloc((argCount + 2) * sizeof(ZUInt));
+    if (signature == NULL) {
+        Zerror("Could not allocate FFI signature!");
+        free(argTypes);
+        free(ffi);
+        return false;
+    }
+    signature[0] = (ZUInt) returnType->size;
+    signature[1] = argCount;
+    for (ZUInt i = 0; i < argCount; ++i) {
+        signature[i + 2] = (ZUInt) argTypes[i]->size;
+    }
+    ffi->signature = signature;
+    if (!ZVector_push(&self->ffi, (ZULong) ffi)) {
+        Zerror("Could not insert FFI binding!");
+        free(signature);
+        free(argTypes);
+        free(ffi);
+        return false;
+    }
+    return true;
+}
+
+/** Invokes the foreign function stored in the library with the given index. */
+ZBool ZLibrary_call(ZLibrary *self, ZUInt index, ZStack *stack) {
+    Zassert(self != NULL, "<self> was NULL!");
+    Zassert(stack != NULL, "<stack> was NULL!");
     Zassert(self->handle != NULL, "<self>'s handle was NULL!");
-    if (func >= self->ffi.count) {
+    if (index >= self->ffi.count) {
         Zerror("Invalid FFI index!");
         return false;
     }
-    ZFFI *ffi = (ZFFI *) ZVector_get(&self->ffi, func);
+    ZFFI *ffi = (ZFFI *) ZVector_get(&self->ffi, index);
     Zassert(ffi->signature != NULL, "<ffi>'s signature array was NULL!");
     Zassert(ffi->func != NULL, "<ffi>'s func was NULL!");
     void *returnValue;

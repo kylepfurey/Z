@@ -53,9 +53,10 @@ enum {
     ZOPCODE_int = 's', // int (write, read, size)
     ZOPCODE_uint = 'u', // uint (write, read, size)
     ZOPCODE_flt = 'f', // flt (write, read, size)
-    ZOPCODE_prep = '`', // prep (read, size)
+    ZOPCODE_type = 't', // type (read, size)
+    ZOPCODE_prep = 'T', // prep (read, size)
     ZOPCODE_ffi = 'F', // ffi (read, size)
-    ZOPCODE_TOTAL = 45, // <= 256
+    ZOPCODE_TOTAL = 46, // <= 256
 };
 
 /** Each bitflag value for an operation. */
@@ -372,6 +373,13 @@ ZASM_API ZBool ZOpcode_uint(
 
 /** flt (write, read, size) */
 ZASM_API ZBool ZOpcode_flt(
+    ZProgram *self,
+    ZCoroutine *coro,
+    ZFileStream *file
+);
+
+/** type (read, size) */
+ZASM_API ZBool ZOpcode_type(
     ZProgram *self,
     ZCoroutine *coro,
     ZFileStream *file

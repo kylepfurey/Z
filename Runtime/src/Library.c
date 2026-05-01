@@ -14,11 +14,8 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
     }
     ZULong nameLen = strlen(name);
     ZChar *buffer;
-
 #ifdef ZASM_WINDOWS
-
     // *.dll
-
     if (nameLen == 4 && strncmp(name, "libc", 4) == 0) {
         self->handle = LoadLibraryA("ucrtbase.dll");
         if (self->handle == NULL || GetProcAddress(self->handle, "printf") == NULL) {
@@ -79,15 +76,10 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         free(buffer);
     }
     return true;
-
 #else
-
 #ifdef ZASM_POSIX
-
 #ifdef ZASM_MACOS
-
     // lib*.dylib
-
     if (nameLen == 4 && strncmp(name, "libc", 4) == 0) {
         self->handle = dlopen("/usr/lib/libSystem.B.dylib", RTLD_NOW | RTLD_GLOBAL);
         if (self->handle == NULL || dlsym(self->handle, "printf") == NULL) {
@@ -158,11 +150,8 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         free(buffer);
     }
     return true;
-
 #else
-
     // lib*.so
-
     if (nameLen == 4 && strncmp(name, "libc", 4) == 0) {
         self->handle = dlopen("libc.so.6", RTLD_NOW | RTLD_GLOBAL);
         if (self->handle == NULL || dlsym(self->handle, "printf") == NULL) {
@@ -227,13 +216,9 @@ ZBool ZLibrary_new(ZLibrary *self, ZString name) {
         free(buffer);
     }
     return true;
-
 #endif
-
 #endif
-
 #endif
-
     Zerror("Cannot load with unknown dynamic library format!");
     ZVector_delete(&self->ffi);
     return false;
@@ -244,21 +229,13 @@ ZFunc ZLibrary_find(ZLibrary *self, ZString name) {
     Zassert(self != NULL, "<self> was NULL!");
     Zassert(name != NULL, "<name> was NULL!");
     Zassert(self->handle != NULL, "<self>'s handle was NULL!");
-
 #ifdef ZASM_WINDOWS
-
     return (ZFunc) GetProcAddress(self->handle, name);
-
 #else
-
 #ifdef ZASM_POSIX
-
     return (ZFunc) dlsym(self->handle, name);
-
 #endif
-
 #endif
-
     Zerror("Cannot get function with unknown dynamic library format!");
     return NULL;
 }
@@ -397,21 +374,13 @@ ZBool ZLibrary_call(ZLibrary *self, ZUInt index, ZStack *stack) {
 void ZLibrary_delete(ZLibrary *self) {
     Zassert(self != NULL, "<self> was NULL!");
     Zassert(self->handle != NULL, "<self>'s handle was NULL!");
-
 #ifdef ZASM_WINDOWS
-
     FreeLibrary(self->handle);
-
 #else
-
 #ifdef ZASM_POSIX
-
     dlclose(self->handle);
-
 #endif
-
 #endif
-
     self->handle = NULL;
     for (ZUInt i = 0; i < self->ffi.count; ++i) {
         ZFFI *ffi = (ZFFI *) ZVector_get(&self->ffi, i);

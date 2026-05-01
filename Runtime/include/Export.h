@@ -12,75 +12,55 @@
 #define ZASM_HOME_VAR "ZASM_HOME"
 
 #if defined(_WIN32) || defined(_WIN64)
-
-/** Compiled to Windows. */
-#define ZASM_WINDOWS
-
+    /** Compiled to Windows. */
+    #define ZASM_WINDOWS
 #elif defined(__APPLE__)
+    /** Compiled to MacOS. */
+    #define ZASM_MACOS
 
-/** Compiled to MacOS. */
-#define ZASM_MACOS
-
-/** POSIX support. */
-#define ZASM_POSIX
-
+    /** POSIX support. */
+    #define ZASM_POSIX
 #else
+    /** Compiled to Linux. */
+    #define ZASM_LINUX
 
-/** Compiled to Linux. */
-#define ZASM_LINUX
-
-/** POSIX support. */
-#define ZASM_POSIX
-
+    /** POSIX support. */
+    #define ZASM_POSIX
 #endif
 
 #ifdef ZASM_WINDOWS
+    /** File path separator. */
+    #define ZASM_PATH_SEPARATOR '\\'
 
-/** File path separator. */
-#define ZASM_PATH_SEPARATOR '\\'
+    #ifdef ZASM_EXPORTS
+        /** Windows export. */
+        #define ZASM_API __declspec(dllexport) inline
 
-#ifdef ZASM_EXPORTS
-
-/** Windows export. */
-#define ZASM_API __declspec(dllexport) inline
-
-/** Defined if SIGINT is a valid way to kill a ZASM program. */
-#define ZASM_SIGINT
-
+        /** Defined if SIGINT is a valid way to kill a ZASM program. */
+        #define ZASM_SIGINT
+    #else
+        /** Windows import. */
+        #define ZASM_API __declspec(dllimport) inline
+    #endif
 #else
+    /** File path separator. */
+    #define ZASM_PATH_SEPARATOR '/'
 
-/** Windows import. */
-#define ZASM_API __declspec(dllimport) inline
+    #ifdef ZASM_EXPORTS
+        /** MacOS / Linux export. */
+        #define ZASM_API __attribute__((visibility("default"))) inline
+    #else
+        /** Fallback. */
+        #define ZASM_API inline
 
-#endif
-
-#else
-
-/** File path separator. */
-#define ZASM_PATH_SEPARATOR '/'
-
-#ifdef ZASM_EXPORTS
-
-/** MacOS / Linux export. */
-#define ZASM_API __attribute__((visibility("default"))) inline
-
-#else
-
-/** Fallback. */
-#define ZASM_API inline
-
-/** Defined if SIGINT is a valid way to kill a ZASM program. */
-#define ZASM_SIGINT
-
-#endif
-
+        /** Defined if SIGINT is a valid way to kill a ZASM program. */
+        #define ZASM_SIGINT
+    #endif
 #endif
 
 #ifdef _DEBUG
-
-/** ZASM Runtime Debugging */
-#define ZASM_DEBUG
-
+    /** ZASM Runtime Debugging */
+    #define ZASM_DEBUG
 #endif
 
 #endif // ZASM_EXPORT_H
